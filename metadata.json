@@ -1,0 +1,6 @@
+{
+  "name": "Procware - Dein Wettbewerbsvorteil im E-Commerce",
+  "description": "Procware ist dein Partner für verlässliches Sourcing, transparente Konditionen, 100% deutsches Fulfillment und automatisierten Express-Versand für Shopify-Stores.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
