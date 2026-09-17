@@ -158,6 +158,62 @@ export const TOOLS_SEO: Record<string, ToolSeoConfig> = {
       keywords: "customer lifetime value calculator, clv calculator ecommerce, calculate clv shopify, clv to cac ratio calculator",
     },
   },
+  safetyStock: {
+    de: {
+      title: "Safety Stock & Meldebestand Rechner | Formel & Berechnung | Procware",
+      description: "Kostenloser Rechner für Meldebestand & Safety Stock (Sicherheitsbestand): Berechne den optimalen Bestellzeitpunkt, Pufferbestand und Kapitalbindung mit Min-Max- und Service-Level-Formel.",
+      canonicalPath: "/safety-stock-calculator",
+      keywords: "safety stock calculator, meldebestand rechner, safety stock formel, meldebestand formel, meldebestand berechnung, sicherheitsbestand rechner, reorder point calculator",
+    },
+    en: {
+      title: "Safety Stock & Reorder Point (ROP) Calculator | Formulas & Calculation | Procware",
+      description: "Free Safety Stock and Reorder Point (ROP) Calculator: Calculate exact reorder triggers, buffer inventory, and tied-up working capital with classical Min-Max and statistical service level formulas.",
+      canonicalPath: "/en/safety-stock-calculator",
+      keywords: "safety stock calculator, reorder point calculator, safety stock formula, meldebestand formel, meldebestand berechnung, reorder point formula, calculate reorder point",
+    },
+  },
+  shopifySalesTracker: {
+    de: {
+      title: "Shopify Sales Tracker & Estimator: Shopify Umsatz sehen (Free) | Procware",
+      description: "Kostenloser Shopify Sales Tracker: Finde heraus wie viel Umsatz jeder Shopify Store macht. Shopify Umsatz sehen, Bestseller analysieren und tägliche Verkaufszahlen schätzen.",
+      canonicalPath: "/shopify-sales-tracker",
+      keywords: "Shopify Sales Tracker, Shopify Sales Tracker Free, Shopify Umsatz, Shopify Umsatz sehen, Shopify Sales Estimator",
+    },
+    en: {
+      title: "Shopify Sales Tracker & Sales Estimator (Free) | Track Store Revenue | Procware",
+      description: "Free Shopify Sales Tracker and Sales Estimator: Track any Shopify store's daily revenue, units sold, and best-selling products. See any Shopify store sales volume for free.",
+      canonicalPath: "/en/shopify-sales-tracker",
+      keywords: "Shopify Sales Tracker, Shopify Sales Tracker Free, Shopify Umsatz, Shopify Umsatz sehen, Shopify Sales Estimator",
+    },
+  },
+  trendingProducts: {
+    de: {
+      title: "Trending Products Finder: Trending Products for Dropshipping & E-Commerce 2026 | Procware",
+      description: "Finde verifizierte Trending Products for Dropshipping und E-Commerce: Entdecke virale Shopify Trending Products, 7-Tage-Verkaufssprünge und Meta Ad Spend vor der Marktsättigung.",
+      canonicalPath: "/trending-products",
+      keywords: "Trending Products, Trending Products for Dropshipping, E-commerce Trending Products, Shopify Trending Products",
+    },
+    en: {
+      title: "Trending Products Finder: Best Trending Products for Dropshipping & Shopify | Procware",
+      description: "Find high-margin Trending Products for Dropshipping and E-commerce: Track viral Shopify Trending Products, 7-day velocity spikes, and supplier margins.",
+      canonicalPath: "/en/trending-products",
+      keywords: "Trending Products, Trending Products for Dropshipping, E-commerce Trending Products, Shopify Trending Products",
+    },
+  },
+  competitorPriceTracker: {
+    de: {
+      title: "Competitor Price Tracker: Konkurrenz- & Mitbewerber-Preise überwachen | Procware",
+      description: "Professioneller Competitor Price Tracker für E-Commerce & Shopify: Überwache Preise deiner Wettbewerber automatisiert, erhalte Sofort-Alerts bei Preissenkungen und schütze deine Marge.",
+      canonicalPath: "/competitor-price-tracker",
+      keywords: "Competitor Price Tracker, Competitor Price Tracker Free, Mitbewerber Preis Tracker, Preisüberwachung E-Commerce, Shopify Preis Tracker",
+    },
+    en: {
+      title: "Competitor Price Tracker for E-Commerce & Shopify | Live Price Alerts | Procware",
+      description: "Free Competitor Price Tracker for online stores: Monitor competitor prices automatically, receive instant alerts on price changes, and defend your profit margins.",
+      canonicalPath: "/en/competitor-price-tracker",
+      keywords: "Competitor Price Tracker, Competitor Price Tracker Free, Price Tracker Ecommerce, Shopify Price Monitor",
+    },
+  },
 };
 
 /**

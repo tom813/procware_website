@@ -36,6 +36,16 @@ import { RoasCalculatorPage } from "./components/RoasCalculatorPage";
 import { BreakEvenRoasCalculatorPage } from "./components/BreakEvenRoasCalculatorPage";
 import { ShopifyMargenrechnerPage } from "./components/ShopifyMargenrechnerPage";
 import { LiquiditaetsplanungPage } from "./components/LiquiditaetsplanungPage";
+import { SafetyStockCalculatorPage } from "./components/SafetyStockCalculatorPage";
+import { ShopifySalesTrackerPage } from "./components/ShopifySalesTrackerPage";
+import { TrendingProductsFinderPage } from "./components/TrendingProductsFinderPage";
+import { CompetitorPriceTrackerPage } from "./components/CompetitorPriceTrackerPage";
+import { ShopifySalesTrackerSuite } from "./components/suite/ShopifySalesTrackerSuite";
+import { TrendingProductsSuite } from "./components/suite/TrendingProductsSuite";
+import { CompetitorPriceTrackerSuite } from "./components/suite/CompetitorPriceTrackerSuite";
+import { SuiteLayout } from "./components/suite/SuiteLayout";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CompetitorProvider } from "./context/CompetitorContext";
 import { BLOG_ARTICLES } from "./data/procwareData";
 import { Calendar, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 
@@ -191,17 +201,23 @@ function MainApp() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthModalOpen, authModalMode, closeAuthModal, openAuthModal } = useAuth();
+
+  const isSuiteRoute = location.pathname.startsWith("/suite");
 
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-blue-600 selection:text-white antialiased font-sans">
       <ScrollToTop />
 
-      {/* Header Navigation */}
-      <Header
-        onOpenBooking={() => setIsBookingOpen(true)}
-        onOpenLogin={() => setIsLoginOpen(true)}
-        onOpenRegister={() => setIsRegisterOpen(true)}
-      />
+      {/* Header Navigation - shown on public/marketing pages */}
+      {!isSuiteRoute && (
+        <Header
+          onOpenBooking={() => setIsBookingOpen(true)}
+          onOpenLogin={() => openAuthModal("login", location.pathname)}
+          onOpenRegister={() => openAuthModal("register", location.pathname)}
+        />
+      )}
 
       <Routes>
         <Route
@@ -430,6 +446,44 @@ function MainApp() {
           }
         />
 
+        {/* 7. Safety Stock & Meldebestand Rechner */}
+        <Route
+          path="/safety-stock-calculator"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+        <Route
+          path="/meldebestand-rechner"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+        <Route
+          path="/sicherheitsbestand-rechner"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+        <Route
+          path="/meldebestand-berechnung"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+        <Route
+          path="/safety-stock-formel"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+        <Route
+          path="/meldebestand-formel"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} />
+          }
+        />
+
         {/* English Tool Routes */}
         <Route
           path="/en/tools"
@@ -534,31 +588,167 @@ function MainApp() {
           }
         />
         <Route
+          path="/en/safety-stock-calculator"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} lang="en" />
+          }
+        />
+        <Route
+          path="/en/reorder-point-calculator"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} lang="en" />
+          }
+        />
+        <Route
+          path="/en/safety-stock-formula"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} lang="en" />
+          }
+        />
+        <Route
+          path="/en/reorder-point-formula"
+          element={
+            <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} lang="en" />
+          }
+        />
+        {/* Procware Ecom Suite (Auth-Gated SaaS Tools) */}
+        <Route path="/suite" element={<ShopifySalesTrackerSuite />} />
+        <Route path="/suite/sales-tracker" element={<ShopifySalesTrackerSuite />} />
+        <Route path="/suite/trending-products" element={<TrendingProductsSuite />} />
+        <Route path="/suite/price-tracker" element={<CompetitorPriceTrackerSuite />} />
+
+        {/* Procware Ecom Suite - Integrated Free Tools (No SEO Fluff, Suite Mode) */}
+        <Route
+          path="/suite/barcode-generator"
+          element={
+            <SuiteLayout activeModule="barcode">
+              <BarcodeGeneratorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/shopify-theme-detector"
+          element={
+            <SuiteLayout activeModule="theme-detector">
+              <ShopifyThemeDetectorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/shopify-app-detector"
+          element={
+            <SuiteLayout activeModule="app-detector">
+              <ShopifyAppDetectorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/customer-lifetime-value-calculator"
+          element={
+            <SuiteLayout activeModule="clv">
+              <CustomerLifetimeValueCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/shopify-fee-calculator"
+          element={
+            <SuiteLayout activeModule="fee-calculator">
+              <ShopifyFeeCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/roas-calculator"
+          element={
+            <SuiteLayout activeModule="roas">
+              <RoasCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/break-even-roas-calculator"
+          element={
+            <SuiteLayout activeModule="be-roas">
+              <BreakEvenRoasCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/shopify-margin-calculator"
+          element={
+            <SuiteLayout activeModule="margin">
+              <ShopifyMargenrechnerPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/cash-flow-planner-online-shop"
+          element={
+            <SuiteLayout activeModule="liquidity">
+              <LiquiditaetsplanungPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+        <Route
+          path="/suite/safety-stock-calculator"
+          element={
+            <SuiteLayout activeModule="safety-stock">
+              <SafetyStockCalculatorPage onOpenBooking={() => setIsBookingOpen(true)} hideSeoContent={true} />
+            </SuiteLayout>
+          }
+        />
+
+        {/* Public SEO Landing Pages for the 3 Intelligence Tools */}
+        <Route path="/shopify-sales-tracker" element={<ShopifySalesTrackerPage />} />
+        <Route path="/shopify-sales-tracker-free" element={<ShopifySalesTrackerPage />} />
+        <Route path="/en/shopify-sales-tracker" element={<ShopifySalesTrackerPage lang="en" />} />
+        <Route path="/en/shopify-sales-tracker-free" element={<ShopifySalesTrackerPage lang="en" />} />
+
+        <Route path="/trending-products" element={<TrendingProductsFinderPage />} />
+        <Route path="/trending-products-for-dropshipping" element={<TrendingProductsFinderPage />} />
+        <Route path="/en/trending-products" element={<TrendingProductsFinderPage lang="en" />} />
+        <Route path="/en/trending-products-for-dropshipping" element={<TrendingProductsFinderPage lang="en" />} />
+
+        <Route path="/competitor-price-tracker" element={<CompetitorPriceTrackerPage />} />
+        <Route path="/competitor-price-tracker-free" element={<CompetitorPriceTrackerPage />} />
+        <Route path="/en/competitor-price-tracker" element={<CompetitorPriceTrackerPage lang="en" />} />
+        <Route path="/en/competitor-price-tracker-free" element={<CompetitorPriceTrackerPage lang="en" />} />
+
+        <Route
           path="*"
           element={
             <LandingPage
               onOpenBooking={() => setIsBookingOpen(true)}
-              onOpenRegister={() => setIsRegisterOpen(true)}
+              onOpenRegister={() => openAuthModal("register", location.pathname)}
             />
           }
         />
       </Routes>
 
-      {/* Footer */}
-      <Footer
-        onOpenLogin={() => setIsLoginOpen(true)}
-        onOpenBooking={() => setIsBookingOpen(true)}
-        onNavigateHome={() => navigate("/")}
-      />
+      {/* Footer - shown on public/marketing pages */}
+      {!isSuiteRoute && (
+        <Footer
+          onOpenLogin={() => openAuthModal("login", location.pathname)}
+          onOpenBooking={() => setIsBookingOpen(true)}
+          onNavigateHome={() => navigate("/")}
+        />
+      )}
 
       {/* Modals & Dialogs */}
       <Modals
         isBookingOpen={isBookingOpen}
         onCloseBooking={() => setIsBookingOpen(false)}
-        isLoginOpen={isLoginOpen}
-        onCloseLogin={() => setIsLoginOpen(false)}
-        isRegisterOpen={isRegisterOpen}
-        onCloseRegister={() => setIsRegisterOpen(false)}
+        isLoginOpen={isLoginOpen || (isAuthModalOpen && authModalMode === "login")}
+        onCloseLogin={() => {
+          setIsLoginOpen(false);
+          closeAuthModal();
+        }}
+        isRegisterOpen={isRegisterOpen || (isAuthModalOpen && authModalMode === "register")}
+        onCloseRegister={() => {
+          setIsRegisterOpen(false);
+          closeAuthModal();
+        }}
       />
     </div>
   );
@@ -567,7 +757,11 @@ function MainApp() {
 export default function App() {
   return (
     <BrowserRouter>
-      <MainApp />
+      <AuthProvider>
+        <CompetitorProvider>
+          <MainApp />
+        </CompetitorProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

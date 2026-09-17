@@ -11,8 +11,7 @@ import {
 
 export const PROCWARE_LOGO = "/procware-logo-wide.png";
 
-export const PROCWARE_ICON =
-  "https://procware.de/wp-content/uploads/2025/05/cropped-procware-icon-Photoroom-e1746621559788.png";
+export const PROCWARE_ICON = "/procware-logo-wide.png";
 
 export const HERO_VIDEO_URL =
   "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
@@ -132,7 +131,7 @@ export const FEATURES: FeatureItem[] = [
       "Vollständige Preistransparenz ohne versteckte Gebühren",
       "Qualitätsmuster vorab zur Freigabe",
     ],
-    imageUrl: "https://procware.de/wp-content/uploads/2025/06/rundgang.png",
+    imageUrl: "/images/stock_sourcing_rfq.jpg",
     imageAlt: "Procware Produktanfrage und Sourcing Dashboard",
     highlightBadge: "Fabrikpreise verhandelt",
     tag: "RFQ & Kalkulation",
@@ -149,25 +148,25 @@ export const FEATURES: FeatureItem[] = [
       "Fotobeweise und Qualitätsprüfberichte direkt im Feed",
       "Keine Sprachbarrieren oder mühsame Agenten-Kommunikation",
     ],
-    imageUrl: "https://procware.de/wp-content/uploads/2025/06/demo-produkt-chat.png",
-    imageAlt: "Procware Sourcing-Support Chat und Musterprüfung",
+    imageUrl: "/images/stock_sourcing_chat.jpg",
+    imageAlt: "Procware Sourcing-Support Chat und Beratung",
     highlightBadge: "Deutsches Partner-Team",
     tag: "Live-Kommunikation",
   },
   {
     id: "feature-3",
     stepNumber: "03",
-    title: "100% Deutsches Fulfillment & globaler Versand",
+    title: "100% Deutsches Fulfillment & CO2-neutraler Versand",
     description:
-      "Sobald du verkaufst, übernehmen wir Einlagerung, Pick & Pack, Qualitätsprüfung und Express-Versand – vollautomatisiert.",
+      "Sobald du verkaufst, übernehmen wir Einlagerung, Pick & Pack, Qualitätsprüfung und Express-Versand – vollautomatisiert und CO2-kompensiert.",
     bullets: [
       "100% deutsches Fulfillment: Lagerung, Kommissionierung & Same-Day-Versand aus Deutschland",
       "Vollautomatische Synchronisation mit deinem Shopify-Shop ohne manuellen Aufwand",
       "Lückenlose Sendungsverfolgung (DHL, Hermes, DPD, GLS) direkt an deine Endkunden",
       "Deutsches Retourenzentrum mit 24h-Prüfung, Fotodokumentation & Aufbereitung",
     ],
-    imageUrl: "https://procware.de/wp-content/uploads/2025/06/procware-shopify-app.png",
-    imageAlt: "Procware Deutsches Fulfillment Dashboard & Shopify Sync",
+    imageUrl: "/images/stock_sourcing_rfq.jpg",
+    imageAlt: "Procware Customer Dashboard Invoices & Fulfillment",
     highlightBadge: "Deutsches Lager & Express",
     tag: "100% Deutsches Fulfillment",
   },
@@ -198,29 +197,29 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
 ];
 
 export const COUNTRIES: CountryItem[] = [
-  { name: "Deutschland", flagUrl: "https://procware.de/wp-content/uploads/2024/05/germany-1.png", deliveryDays: "5-7 Tage" },
-  { name: "Österreich", flagUrl: "https://procware.de/wp-content/uploads/2025/06/austria.png", deliveryDays: "5-8 Tage" },
-  { name: "Schweiz", flagUrl: "https://procware.de/wp-content/uploads/2025/06/switzerland.png", deliveryDays: "5-8 Tage" },
-  { name: "Spanien", flagUrl: "https://procware.de/wp-content/uploads/2024/05/spain-1.png", deliveryDays: "6-8 Tage" },
-  { name: "Frankreich", flagUrl: "https://procware.de/wp-content/uploads/2024/05/france-1.png", deliveryDays: "5-8 Tage" },
-  { name: "USA", flagUrl: "https://procware.de/wp-content/uploads/2024/05/1200px-United-states_flag_icon_round-1.png", deliveryDays: "6-9 Tage" },
-  { name: "Australien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/australia.png", deliveryDays: "7-10 Tage" },
-  { name: "Belgien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/belgium.png", deliveryDays: "5-7 Tage" },
-  { name: "Bulgarien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/bulgaria.png", deliveryDays: "6-9 Tage" },
-  { name: "Kanada", flagUrl: "https://procware.de/wp-content/uploads/2025/06/canada.png", deliveryDays: "7-10 Tage" },
-  { name: "Kroatien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/croatia.png", deliveryDays: "6-8 Tage" },
-  { name: "Tschechien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/czech-republic.png", deliveryDays: "5-8 Tage" },
-  { name: "Italien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/italy.png", deliveryDays: "5-8 Tage" },
-  { name: "Luxemburg", flagUrl: "https://procware.de/wp-content/uploads/2025/06/luxembourg.png", deliveryDays: "5-7 Tage" },
-  { name: "Niederlande", flagUrl: "https://procware.de/wp-content/uploads/2025/06/netherlands.png", deliveryDays: "5-7 Tage" },
-  { name: "Neuseeland", flagUrl: "https://procware.de/wp-content/uploads/2025/06/new-zealand.png", deliveryDays: "8-12 Tage" },
-  { name: "Polen", flagUrl: "https://procware.de/wp-content/uploads/2025/06/poland.png", deliveryDays: "5-8 Tage" },
-  { name: "Portugal", flagUrl: "https://procware.de/wp-content/uploads/2025/06/portugal.png", deliveryDays: "6-9 Tage" },
-  { name: "Rumänien", flagUrl: "https://procware.de/wp-content/uploads/2025/06/romania.png", deliveryDays: "6-9 Tage" },
-  { name: "Slowakei", flagUrl: "https://procware.de/wp-content/uploads/2025/06/slovakia.png", deliveryDays: "6-8 Tage" },
-  { name: "Südafrika", flagUrl: "https://procware.de/wp-content/uploads/2025/06/south-africa.png", deliveryDays: "8-12 Tage" },
-  { name: "Schweden", flagUrl: "https://procware.de/wp-content/uploads/2025/06/sweden.png", deliveryDays: "6-8 Tage" },
-  { name: "Großbritannien (UK)", flagUrl: "https://procware.de/wp-content/uploads/2025/06/united-kingdom.png", deliveryDays: "5-8 Tage" },
+  { name: "Deutschland", flagUrl: "/flags/de.png", deliveryDays: "5-7 Tage" },
+  { name: "Österreich", flagUrl: "/flags/at.png", deliveryDays: "5-8 Tage" },
+  { name: "Schweiz", flagUrl: "/flags/ch.png", deliveryDays: "5-8 Tage" },
+  { name: "Spanien", flagUrl: "/flags/es.png", deliveryDays: "6-8 Tage" },
+  { name: "Frankreich", flagUrl: "/flags/fr.png", deliveryDays: "5-8 Tage" },
+  { name: "USA", flagUrl: "/flags/us.png", deliveryDays: "6-9 Tage" },
+  { name: "Australien", flagUrl: "/flags/au.png", deliveryDays: "7-10 Tage" },
+  { name: "Belgien", flagUrl: "/flags/be.png", deliveryDays: "5-7 Tage" },
+  { name: "Bulgarien", flagUrl: "/flags/bg.png", deliveryDays: "6-9 Tage" },
+  { name: "Kanada", flagUrl: "/flags/ca.png", deliveryDays: "7-10 Tage" },
+  { name: "Kroatien", flagUrl: "/flags/hr.png", deliveryDays: "6-8 Tage" },
+  { name: "Tschechien", flagUrl: "/flags/cz.png", deliveryDays: "5-8 Tage" },
+  { name: "Italien", flagUrl: "/flags/it.png", deliveryDays: "5-8 Tage" },
+  { name: "Luxemburg", flagUrl: "/flags/lu.png", deliveryDays: "5-7 Tage" },
+  { name: "Niederlande", flagUrl: "/flags/nl.png", deliveryDays: "5-7 Tage" },
+  { name: "Neuseeland", flagUrl: "/flags/nz.png", deliveryDays: "8-12 Tage" },
+  { name: "Polen", flagUrl: "/flags/pl.png", deliveryDays: "5-8 Tage" },
+  { name: "Portugal", flagUrl: "/flags/pt.png", deliveryDays: "6-9 Tage" },
+  { name: "Rumänien", flagUrl: "/flags/ro.png", deliveryDays: "6-9 Tage" },
+  { name: "Slowakei", flagUrl: "/flags/sk.png", deliveryDays: "6-8 Tage" },
+  { name: "Südafrika", flagUrl: "/flags/za.png", deliveryDays: "8-12 Tage" },
+  { name: "Schweden", flagUrl: "/flags/se.png", deliveryDays: "6-8 Tage" },
+  { name: "Großbritannien (UK)", flagUrl: "/flags/gb.png", deliveryDays: "5-8 Tage" },
 ];
 
 export const CASE_STUDIES: CaseStudyItem[] = [
@@ -230,7 +229,7 @@ export const CASE_STUDIES: CaseStudyItem[] = [
     category: "Online Shop",
     brandName: "pheromiya.de",
     date: "11. Mai 2025",
-    imageUrl: "https://procware.de/wp-content/uploads/2025/05/Screenshot-2025-05-11-220256-960x718.png",
+    imageUrl: "/images/quality-inspection.jpg",
     summary:
       "Wie die Parfüm- und Lifestyle-Brand pheromiya.de durch Procware das Sourcing optimierte, Lieferzeiten um 42% senkte und über 15.000 monatliche Bestellungen fehlerfrei automatisiert.",
     keyStats: [
@@ -248,7 +247,7 @@ export const CASE_STUDIES: CaseStudyItem[] = [
     category: "Agentur",
     brandName: "Gobrand Performance Marketing",
     date: "30. Juli 2024",
-    imageUrl: "https://procware.de/wp-content/uploads/2024/07/ChatGPT-Image-4.-Mai-2025-18_57_18-960x718.png",
+    imageUrl: "/images/express-shipping.jpg",
     summary:
       "Wie die E-Commerce Agentur Gobrand für über 20 betreute Mandanten-Shops das komplette Sourcing und Fulfillment über Procware skalierte und den operativen Aufwand eliminierte.",
     keyStats: [

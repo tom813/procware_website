@@ -250,8 +250,8 @@ export const TrustpilotReviewsSection: React.FC = () => {
             <div className="text-xs font-semibold text-slate-600 mt-1">5-Sterne auf Trustpilot</div>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="text-2xl font-black text-slate-950">5 - 8 Tage</div>
-            <div className="text-xs font-semibold text-slate-600 mt-1">Lieferung in die EU</div>
+            <div className="text-2xl font-black text-slate-950">1 - 3 Tage</div>
+            <div className="text-xs font-semibold text-slate-600 mt-1">Express D-A-CH &amp; EU</div>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <div className="text-2xl font-black text-slate-950">Persönlich</div>

@@ -25,24 +25,30 @@ import {
   Filter,
 } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { useCompetitors } from "../context/CompetitorContext";
 import { AppDetectionResult, DetectedAppDetail } from "../data/shopifyAppsData";
 
 interface ShopifyAppDetectorPageProps {
   onOpenBooking: () => void;
   lang?: "de" | "en";
+  hideSeoContent?: boolean;
 }
 
 export const ShopifyAppDetectorPage: React.FC<ShopifyAppDetectorPageProps> = ({
   onOpenBooking,
   lang: propLang,
+  hideSeoContent = false,
 }) => {
   const location = useLocation();
+  const { competitors } = useCompetitors();
   const currentLang: "de" | "en" = propLang || (location.pathname.startsWith("/en") ? "en" : "de");
 
   useEffect(() => {
-    applyToolSeo("appDetector", currentLang);
-    window.scrollTo(0, 0);
-  }, [currentLang]);
+    if (!hideSeoContent) {
+      applyToolSeo("appDetector", currentLang);
+      window.scrollTo(0, 0);
+    }
+  }, [currentLang, hideSeoContent]);
 
   const [urlInput, setUrlInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -168,13 +174,15 @@ Analysiert mit Procware Shopify App Detector: https://procware.de/shopify-app-de
   }, [result]);
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen pt-24 sm:pt-28 pb-20">
+    <div className={hideSeoContent ? "bg-white text-slate-900 rounded-3xl border border-slate-200 p-4 sm:p-8 shadow-xs" : "bg-white text-slate-900 min-h-screen pt-24 sm:pt-28 pb-20"}>
       {/* Main Detector Tool Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-16">
+      <section className={hideSeoContent ? "max-w-5xl mx-auto" : "max-w-5xl mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-16"}>
         {/* Language Switcher */}
-        <div className="flex justify-center mb-6">
-          <ToolLanguageSwitcher toolKey="appDetector" currentLang={currentLang} />
-        </div>
+        {!hideSeoContent && (
+          <div className="flex justify-center mb-6">
+            <ToolLanguageSwitcher toolKey="appDetector" currentLang={currentLang} />
+          </div>
+        )}
 
         {/* Header & Subtitle */}
         <div className="text-center max-w-3xl mx-auto mb-8">
@@ -254,30 +262,51 @@ Analysiert mit Procware Shopify App Detector: https://procware.de/shopify-app-de
           )}
 
           {/* Quick Demo Store Buttons */}
-          <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-slate-700">Schnell-Test:</span>
-              {["snocks.com", "gymshark.com", "waterdrop.de", "purelei.com"].map((store) => (
-                <button
-                  key={store}
-                  onClick={() => {
-                    setUrlInput(store);
-                    handleDetect(store);
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition-colors cursor-pointer"
-                >
-                  {store}
-                </button>
-              ))}
-            </div>
+          <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col gap-3 text-xs text-slate-500">
+            {competitors && competitors.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-bold text-slate-900">Aus Competitors wählen:</span>
+                {competitors.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      setUrlInput(c.domain);
+                      handleDetect(c.domain);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold border border-blue-200 transition-colors cursor-pointer text-[11px]"
+                  >
+                    {c.name} ({c.domain})
+                  </button>
+                ))}
+              </div>
+            )}
 
-            <button
-              onClick={() => setManualSourceMode(!manualSourceMode)}
-              className="text-slate-500 hover:text-slate-800 font-medium inline-flex items-center gap-1 cursor-pointer"
-            >
-              <Code2 className="w-3.5 h-3.5 text-slate-400" />
-              <span>{manualSourceMode ? "Quelltext-Eingabe schließen" : "Quelltext manuell einfügen"}</span>
-            </button>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-bold text-slate-700">Schnell-Test:</span>
+                {["snocks.com", "gymshark.com", "waterdrop.de", "purelei.com"].map((store) => (
+                  <button
+                    key={store}
+                    onClick={() => {
+                      setUrlInput(store);
+                      handleDetect(store);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition-colors cursor-pointer"
+                  >
+                    {store}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setManualSourceMode(!manualSourceMode)}
+                className="text-slate-500 hover:text-slate-800 font-medium inline-flex items-center gap-1 cursor-pointer"
+              >
+                <Code2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>{manualSourceMode ? "Quelltext-Eingabe schließen" : "Quelltext manuell einfügen"}</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -538,7 +567,8 @@ Analysiert mit Procware Shopify App Detector: https://procware.de/shopify-app-de
       {/* ========================================================= */}
       {/* RICH SEO KNOWLEDGE CONTENT: "SHOPIFY APP DETECTOR" */}
       {/* ========================================================= */}
-      <section className="border-t border-slate-200 bg-slate-50 py-16 sm:py-24">
+      {!hideSeoContent && (
+        <section className="border-t border-slate-200 bg-slate-50 py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-16">
           {/* SEO Heading Intro */}
           <div className="space-y-4">
@@ -715,6 +745,7 @@ Analysiert mit Procware Shopify App Detector: https://procware.de/shopify-app-de
           </div>
         </div>
       </section>
+      )}
     </div>
   );
 };

@@ -24,6 +24,7 @@ import { Badge } from "./ui/badge";
 interface ShopifyFeeCalculatorPageProps {
   onOpenBooking: () => void;
   lang?: "de" | "en";
+  hideSeoContent?: boolean;
 }
 
 type BillingInterval = "monthly" | "yearly";
@@ -81,6 +82,7 @@ const PLAN_CONFIGS: Record<string, PlanTierConfig> = {
 export const ShopifyFeeCalculatorPage: React.FC<ShopifyFeeCalculatorPageProps> = ({
   onOpenBooking,
   lang: propLang,
+  hideSeoContent = false,
 }) => {
   const location = useLocation();
   const currentLang: "de" | "en" = propLang || (location.pathname.startsWith("/en") ? "en" : "de");
@@ -784,7 +786,8 @@ Berechnet mit https://procware.io/shopify-fee-calculator`;
       </section>
 
       {/* SEO Content & FAQ */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200">
+      {!hideSeoContent && (
+        <section className="py-12 bg-slate-50 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xs">
             <h2 className="text-2xl font-black text-slate-950 mb-4">
@@ -845,6 +848,7 @@ Berechnet mit https://procware.io/shopify-fee-calculator`;
           </div>
         </div>
       </section>
+      )}
     </div>
   );
 };

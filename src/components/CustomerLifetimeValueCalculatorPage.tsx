@@ -18,11 +18,13 @@ import {
 interface CustomerLifetimeValueCalculatorPageProps {
   onOpenBooking: () => void;
   lang?: "de" | "en";
+  hideSeoContent?: boolean;
 }
 
 export const CustomerLifetimeValueCalculatorPage: React.FC<CustomerLifetimeValueCalculatorPageProps> = ({
   onOpenBooking,
   lang: propLang,
+  hideSeoContent = false,
 }) => {
   const location = useLocation();
   const currentLang: "de" | "en" = propLang || (location.pathname.startsWith("/en") ? "en" : "de");
@@ -598,7 +600,8 @@ Berechnet mit https://procware.io/customer-lifetime-value-calculator`;
       </section>
 
       {/* Educational & SEO Content Section */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200">
+      {!hideSeoContent && (
+        <section className="py-12 bg-slate-50 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Formula Explanation */}
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xs">
@@ -724,6 +727,7 @@ Berechnet mit https://procware.io/customer-lifetime-value-calculator`;
           </div>
         </div>
       </section>
+      )}
     </div>
   );
 };

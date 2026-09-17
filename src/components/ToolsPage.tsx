@@ -18,9 +18,15 @@ import {
   Calendar,
   Layers,
   HelpCircle,
+  ShieldCheck,
+  Tag,
+  BarChart3,
+  Flame,
+  Lock,
 } from "lucide-react";
 import { applyToolSeo } from "../utils/seoUtils";
 import { ToolLanguageSwitcher } from "./ToolLanguageSwitcher";
+import { useAuth } from "../context/AuthContext";
 
 interface ToolsPageProps {
   onOpenBooking: () => void;
@@ -43,6 +49,7 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
     if (currentLang === "en") {
       return [
         { id: "all", label: "All Tools" },
+        { id: "intelligence", label: "🔥 Ecom Intelligence (Pro Suite)" },
         { id: "calculators", label: "Calculators & Profit" },
         { id: "analytics", label: "Shopify Store Intelligence" },
         { id: "operations", label: "Logistics & Barcodes" },
@@ -50,6 +57,7 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
     }
     return [
       { id: "all", label: "Alle Tools" },
+      { id: "intelligence", label: "🔥 Ecom Intelligence (Pro Suite)" },
       { id: "calculators", label: "Kalkulatoren & Finanzen" },
       { id: "analytics", label: "Shopify Store Analyse" },
       { id: "operations", label: "Logistik & Barcodes" },
@@ -59,6 +67,60 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
   const toolsList = useMemo(() => {
     if (currentLang === "en") {
       return [
+        {
+          id: "shopify-sales-tracker",
+          category: "intelligence",
+          title: "Shopify Sales Tracker",
+          tag: "Access Required",
+          badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+          requiresAuth: true,
+          description:
+            "Track real sales volume, daily sold units, and estimated revenue of any Shopify store via historical /products.json inventory snapshots.",
+          bullets: [
+            "Automatic stock decrement difference model",
+            "Continuous store watchlist & snapshot history",
+            "Meta Ad Library scaling signal correlation",
+          ],
+          link: "/en/shopify-sales-tracker",
+          btnText: "Open Sales Tracker",
+          icon: <BarChart3 className="w-5 h-5 text-blue-600" />,
+        },
+        {
+          id: "trending-products",
+          category: "intelligence",
+          title: "Trending Products Finder",
+          tag: "Access Required",
+          badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+          requiresAuth: true,
+          description:
+            "Spot unsaturated winning products through 7-day order growth rates (WoW) before the market saturates with competitors.",
+          bullets: [
+            "Growth acceleration ranking (WoW)",
+            "Unsaturated trend categories & demand validation",
+            "1-click wholesale sourcing quotation",
+          ],
+          link: "/en/trending-products",
+          btnText: "Open Trend Finder",
+          icon: <Flame className="w-5 h-5 text-amber-500" />,
+        },
+        {
+          id: "competitor-price-tracker",
+          category: "intelligence",
+          title: "Competitor Price Tracker & Alerts",
+          tag: "Access Required",
+          badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          requiresAuth: true,
+          description:
+            "Monitor competitor prices with automated snapshot diffs and receive instant alerts when rivals drop prices or run discount sales.",
+          bullets: [
+            "Continuous snapshot price diff engine",
+            "Instant price drop alerts with custom thresholds",
+            "Margin guard comparison against wholesale sourcing",
+          ],
+          link: "/en/competitor-price-tracker",
+          btnText: "Open Price Tracker",
+          icon: <Tag className="w-5 h-5 text-emerald-600" />,
+        },
         {
           id: "barcode",
           category: "operations",
@@ -212,10 +274,81 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
           btnText: "Open Cash Flow Planner",
           icon: <Wallet className="w-5 h-5 text-cyan-500" />,
         },
+        {
+          id: "safety-stock",
+          category: "operations",
+          title: "Safety Stock & Reorder Point (ROP)",
+          tag: "Inventory",
+          badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+          description:
+            "Calculate your exact reorder point, safety stock buffer, and optimal reorder quantity. Protect against stockouts while liberating excess tied-up working capital.",
+          bullets: [
+            "Min-Max & statistical service-level formulas",
+            "Live stock runway & days until reorder",
+            "Order batch size & capital requirement",
+          ],
+          link: "/en/safety-stock-calculator",
+          btnText: "Open Safety Stock Calculator",
+          icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
+        },
       ];
     }
 
     return [
+      {
+        id: "shopify-sales-tracker",
+        category: "intelligence",
+        title: "Shopify Sales Tracker",
+        tag: "Access erforderlich",
+        badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+        requiresAuth: true,
+        description:
+          "Ermittle Verkaufszahlen, tägliche Einheiten und geschätzten Umsatz jedes beliebigen Shopify Stores über historische Lagerbestands-Snapshots (/products.json).",
+        bullets: [
+          "Statistisches Bestands-Differenzmodell",
+          "Dauerhafte Store-Watchlist & Zeitreihen-Snapshots",
+          "Korrelation mit aktiven Meta Werbeanzeigen",
+        ],
+        link: "/shopify-sales-tracker",
+        btnText: "Sales Tracker öffnen",
+        icon: <BarChart3 className="w-5 h-5 text-blue-600" />,
+      },
+      {
+        id: "trending-products",
+        category: "intelligence",
+        title: "Trending Products Finder",
+        tag: "Access erforderlich",
+        badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+        requiresAuth: true,
+        description:
+          "Erkenne ungesättigte Gewinnerprodukte anhand von 7-Tage-Bestellwachstumsraten (WoW) vor der Marktsättigung durch die Konkurrenz.",
+        bullets: [
+          "Fokus auf Beschleunigung & Wachstumsrate (WoW)",
+          "Ungesättigte Trendkategorien & Potenzial-Analyse",
+          "1-Klick Sourcing-Anfrage an unser China-Büro",
+        ],
+        link: "/trending-products",
+        btnText: "Trend-Finder öffnen",
+        icon: <Flame className="w-5 h-5 text-amber-500" />,
+      },
+      {
+        id: "competitor-price-tracker",
+        category: "intelligence",
+        title: "Competitor Price Tracker & Alerts",
+        tag: "Access erforderlich",
+        badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        requiresAuth: true,
+        description:
+          "Beobachte Konkurrenzpreise automatisiert über Zeitreihen-Snapshots und erhalte sofortige Benachrichtigungen bei Preissenkungen der Konkurrenz.",
+        bullets: [
+          "Mathematische Snapshot-Diff Engine",
+          "Sofortige Preissenkungs-Alerts mit Schwellenwerten",
+          "Margenschutz-Abgleich mit Procware Einkaufskosten",
+        ],
+        link: "/competitor-price-tracker",
+        btnText: "Price Tracker öffnen",
+        icon: <Tag className="w-5 h-5 text-emerald-600" />,
+      },
       {
         id: "barcode",
         category: "operations",
@@ -369,6 +502,23 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
         btnText: "Liquiditätsplaner öffnen",
         icon: <Wallet className="w-5 h-5 text-cyan-500" />,
       },
+      {
+        id: "safety-stock",
+        category: "operations",
+        title: "Safety Stock & Meldebestand Rechner",
+        tag: "Bestand",
+        badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+        description:
+          "Berechne den exakten Meldebestand, Sicherheitsbestand und die optimale Nachbestellmenge für deinen Online Shop zur Vermeidung von Out-of-Stock und toter Kapitalbindung.",
+        bullets: [
+          "Min-Max- und Service-Level-Formeln",
+          "Live-Bestandsreichweite & Tage bis Nachbestellung",
+          "Optimale Nachbestellmenge & Kapitalbedarfsermittlung",
+        ],
+        link: "/safety-stock-calculator",
+        btnText: "Safety Stock Rechner öffnen",
+        icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
+      },
     ];
   }, [currentLang]);
 
@@ -392,8 +542,8 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
               <Wrench className="w-3.5 h-3.5 text-blue-600" />
               <span>
                 {currentLang === "en"
-                  ? "Procware Free E-Commerce Tools Suite"
-                  : "Procware Kostenlose E-Commerce Tools"}
+                  ? "Procware E-Commerce Tools Suite (13 Tools)"
+                  : "Procware E-Commerce Tools & Rechner (13 Tools)"}
               </span>
             </div>
 
@@ -403,14 +553,14 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onOpenBooking, lang: propL
 
           <h1 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight mb-4">
             {currentLang === "en"
-              ? "Free Tools & Calculators for Shopify Stores"
-              : "Kostenlose E-Commerce Tools für deinen Shopify Store"}
+              ? "E-Commerce Tools & Calculators for Shopify Stores"
+              : "13 E-Commerce Tools & Rechner für deinen Shopify Store"}
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-3xl leading-relaxed font-normal mb-8">
             {currentLang === "en"
-              ? "Practical calculators, detectors, and generators built for direct-to-consumer brands and Shopify merchants. 100% free, browser-based, and no registration required."
-              : "Praxiserprobte Rechner, Detektoren und Barcode-Generatoren für Shopify Händler. 100% kostenlos, direkt im Browser nutzbar und ohne Registrierung."}
+              ? "Practical calculators, intelligence detectors, price trackers, and generators built for e-commerce brands and Shopify merchants. Optimize margins, track competitors, and identify winning products."
+              : "13 praxiserprobte Rechner, Intelligence-Tools, Detektoren und Barcode-Generatoren für Shopify Händler und E-Commerce Brands. Berechne Margen, überwache Konkurrenzpreise und entdecke virale Winning Products."}
           </p>
 
           {/* Search & Filter Bar */}

@@ -223,6 +223,14 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <Link
+                  to="/safety-stock-calculator"
+                  className="hover:text-white transition-colors"
+                >
+                  Safety Stock & Meldebestand
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/tools"
                   className="hover:text-white transition-colors inline-flex items-center gap-1.5"
                 >
