@@ -14,6 +14,7 @@ import {
   Package,
   Clock,
   RotateCcw,
+  Plane,
 } from "lucide-react";
 import { PROCWARE_LOGO } from "../data/procwareData";
 
@@ -61,7 +62,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Subheading */}
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl font-normal leading-relaxed">
             Verbinde deinen Shopify-Shop mit Procware und profitiere von transparenten Konditionen,
-            zuverlässigem Sourcing, 100% deutschem Fulfillment und automatisiertem Express-Versand.
+            zuverlässigem Sourcing, 1-3 Tagen Lieferzeit aus Deutschland, 6-14 Tagen aus China und automatisiertem Express-Versand.
           </p>
 
           {/* Primary Call to Action Buttons */}
@@ -96,11 +97,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>5-8 Tage Expresslieferung</span>
+              <span>1-3 Tage (DE) &amp; 6-14 Tage (China)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>100% Deutsches Fulfillment & Retouren</span>
+              <span>50.000+ monatliche Bestellungen</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -111,28 +112,47 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* 3 Metric Stat Highlights */}
         <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Card 1: 1-3 Tage aus Deutschland */}
           <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-blue-200 hover:shadow-md transition-all">
             <div className="p-3 rounded-2xl bg-blue-50 text-blue-600 mb-4">
-              <Clock className="w-6 h-6" />
+              <Truck className="w-6 h-6" />
             </div>
             <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight flex items-baseline gap-1.5">
-              <span>5 - 8</span>
+              <span>1 - 3</span>
               <span className="text-xl font-black text-blue-600">Tage</span>
             </div>
             <div className="mt-3 text-base font-extrabold text-slate-900">
-              Schnelle Lieferzeiten
+              Aus Deutschland
             </div>
             <div className="mt-1.5 text-xs text-slate-500 leading-relaxed font-medium">
-              Express Flugfracht zollabgefertigt direkt an Kunden in Deutschland & der EU.
+              Deutsches Fulfillment, blitzschnelle Lagerung, Pick &amp; Pack und Retourenservice direkt vor Ort.
             </div>
           </div>
 
-          <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-blue-200 hover:shadow-md transition-all">
+          {/* Card 2: 6-14 Tage aus China (New Card, dropping 100% deutsches fulfillment) */}
+          <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-amber-200 hover:shadow-md transition-all">
+            <div className="p-3 rounded-2xl bg-amber-50 text-amber-600 mb-4">
+              <Plane className="w-6 h-6" />
+            </div>
+            <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight flex items-baseline gap-1.5">
+              <span>6 - 14</span>
+              <span className="text-xl font-black text-amber-600">Tage</span>
+            </div>
+            <div className="mt-3 text-base font-extrabold text-slate-900">
+              Aus China
+            </div>
+            <div className="mt-1.5 text-xs text-slate-500 leading-relaxed font-medium">
+              Direktversand ab Hersteller per Express-Flugfracht inklusive zollfreier DDP-Zustellung direkt an Endkunden.
+            </div>
+          </div>
+
+          {/* Card 3: 50.000 monatliche Bestellungen */}
+          <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-emerald-200 hover:shadow-md transition-all">
             <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 mb-4">
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight flex items-baseline gap-1">
-              <span>20.000</span>
+              <span>50.000</span>
               <span className="text-2xl font-black text-blue-600">+</span>
             </div>
             <div className="mt-3 text-base font-extrabold text-slate-900">
@@ -140,22 +160,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             <div className="mt-1.5 text-xs text-slate-500 leading-relaxed font-medium">
               Vollautomatisiertes Packing, Labeling und Tracking ohne manuelle Arbeit.
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-blue-200 hover:shadow-md transition-all">
-            <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 mb-4">
-              <RotateCcw className="w-6 h-6" />
-            </div>
-            <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight flex items-baseline gap-1">
-              <span>100</span>
-              <span className="text-2xl font-black text-blue-600">%</span>
-            </div>
-            <div className="mt-3 text-base font-extrabold text-slate-900">
-              Deutsches Fulfillment
-            </div>
-            <div className="mt-1.5 text-xs text-slate-500 leading-relaxed font-medium">
-              Lagerung, Pick & Pack und Retourenservice direkt aus Deutschland.
             </div>
           </div>
         </div>

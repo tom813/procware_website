@@ -90,7 +90,27 @@ export async function checkS3Connection(): Promise<{
       endpoint: "Not configured",
       bucket: "Not configured",
       region: "Not configured",
-      error: "S3_ENDPOINT or credentials missing in environment variables.",
+      error: "S3_ENDPOINT is missing in environment variables.",
+    };
+  }
+
+  if (!config.accessKeyId) {
+    return {
+      connected: false,
+      endpoint: config.endpoint,
+      bucket: config.bucket,
+      region: config.region,
+      error: "S3_ACCESS_KEY_ID (or AWS_ACCESS_KEY_ID) is missing in environment variables.",
+    };
+  }
+
+  if (!config.secretAccessKey) {
+    return {
+      connected: false,
+      endpoint: config.endpoint,
+      bucket: config.bucket,
+      region: config.region,
+      error: "S3_SECRET_ACCESS_KEY (or AWS_SECRET_ACCESS_KEY) is missing in environment variables.",
     };
   }
 
@@ -100,16 +120,29 @@ export async function checkS3Connection(): Promise<{
       throw new Error("Could not initialize S3Client.");
     }
 
-    const res = await client.send(new ListBucketsCommand({}));
-    const bucketNames = (res.Buckets || []).map((b) => b.Name || "").filter(Boolean);
+    // Try global ListBuckets first
+    try {
+      const res = await client.send(new ListBucketsCommand({}));
+      const bucketNames = (res.Buckets || []).map((b) => b.Name || "").filter(Boolean);
 
-    return {
-      connected: true,
-      endpoint: config.endpoint,
-      bucket: config.bucket,
-      region: config.region,
-      buckets: bucketNames,
-    };
+      return {
+        connected: true,
+        endpoint: config.endpoint,
+        bucket: config.bucket,
+        region: config.region,
+        buckets: bucketNames,
+      };
+    } catch {
+      // If ListBuckets is forbidden, test bucket-level access (ListObjectsV2)
+      await client.send(new ListObjectsV2Command({ Bucket: config.bucket, MaxKeys: 1 }));
+      return {
+        connected: true,
+        endpoint: config.endpoint,
+        bucket: config.bucket,
+        region: config.region,
+        buckets: [config.bucket],
+      };
+    }
   } catch (err: any) {
     return {
       connected: false,
