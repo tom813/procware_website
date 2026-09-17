@@ -241,16 +241,23 @@ const FORMAT_CONFIGS: Record<BarcodeFormatKey, FormatConfig> = {
 interface BarcodeGeneratorPageProps {
   onOpenBooking: () => void;
   lang?: "de" | "en";
+  hideSeoContent?: boolean;
 }
 
-export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({ onOpenBooking, lang: propLang }) => {
+export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({
+  onOpenBooking,
+  lang: propLang,
+  hideSeoContent = false,
+}) => {
   const location = useLocation();
   const currentLang: "de" | "en" = propLang || (location.pathname.startsWith("/en") ? "en" : "de");
 
   useEffect(() => {
-    applyToolSeo("barcode", currentLang);
-    window.scrollTo(0, 0);
-  }, [currentLang]);
+    if (!hideSeoContent) {
+      applyToolSeo("barcode", currentLang);
+      window.scrollTo(0, 0);
+    }
+  }, [currentLang, hideSeoContent]);
 
   // Preselected format: CODE128 as standard per screenshot
   const [format, setFormat] = useState<BarcodeFormatKey>("CODE128");
@@ -450,22 +457,24 @@ export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({ onOp
   }, [inputValue, currentConfig]);
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen pt-24 sm:pt-28 pb-20">
+    <div className={hideSeoContent ? "bg-white text-slate-900 rounded-3xl border border-slate-200 p-4 sm:p-8 shadow-xs" : "bg-white text-slate-900 min-h-screen pt-24 sm:pt-28 pb-20"}>
       {/* Main Generator Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-16">
+      <section className={hideSeoContent ? "max-w-5xl mx-auto" : "max-w-5xl mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-16"}>
         {/* Top utility row with Breadcrumb on left and discreet Language Switcher in top right */}
-        <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8">
-          <Link
-            to="/tools"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-          >
-            <span>←</span>
-            <span>{currentLang === "en" ? "All E-Com Tools" : "Alle Tools"}</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <ToolLanguageSwitcher toolKey="barcode" currentLang={currentLang} />
+        {!hideSeoContent && (
+          <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8">
+            <Link
+              to="/tools"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+            >
+              <span>←</span>
+              <span>{currentLang === "en" ? "All E-Com Tools" : "Alle Tools"}</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <ToolLanguageSwitcher toolKey="barcode" currentLang={currentLang} />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Title and Subheading */}
         <div className="text-center max-w-3xl mx-auto mb-8">
@@ -708,41 +717,45 @@ export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({ onOp
         <canvas ref={canvasRef} className="hidden" />
 
         {/* Procware Sourcing Barcode Marketing Callout */}
-        <div className="mt-10 rounded-3xl bg-slate-900 text-white p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{currentLang === "en" ? "Procware Automatic Barcodes" : "Automatische Barcodes bei Procware"}</span>
+        {!hideSeoContent && (
+          <div className="mt-10 rounded-3xl bg-slate-900 text-white p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{currentLang === "en" ? "Procware Automatic Barcodes" : "Automatische Barcodes bei Procware"}</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                {currentLang === "en"
+                  ? "Sourcing with Procware? Barcodes are provided automatically."
+                  : "Wer bei Procware sourct, bekommt Barcodes automatisch zur Verfügung gestellt."}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                {currentLang === "en"
+                  ? "Here you generate the graphical barcode image for individual use. When you source products directly with Procware, you don't need to manually create or paste barcodes: we automatically provide verified GS1-ready barcodes, SKU tags, and packaging labels directly during factory production."
+                  : "Auf dieser Seite generierst du das Bild für deinen Barcode. Wer bei Procware sourct, muss keine Barcodes manuell erstellen oder aufkleben: Wir stellen dir automatisch die passenden Barcodes zur Verfügung und bringen sie direkt ab Fabrik auf deinen Produkten und Verpackungen an."}
+              </p>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              {currentLang === "en"
-                ? "Sourcing with Procware? Barcodes are provided automatically."
-                : "Wer bei Procware sourct, bekommt Barcodes automatisch zur Verfügung gestellt."}
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-              {currentLang === "en"
-                ? "Here you generate the graphical barcode image for individual use. When you source products directly with Procware, you don't need to manually create or paste barcodes: we automatically provide verified GS1-ready barcodes, SKU tags, and packaging labels directly during factory production."
-                : "Auf dieser Seite generierst du das Bild für deinen Barcode. Wer bei Procware sourct, muss keine Barcodes manuell erstellen oder aufkleben: Wir stellen dir automatisch die passenden Barcodes zur Verfügung und bringen sie direkt ab Fabrik auf deinen Produkten und Verpackungen an."}
-            </p>
+            <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <a
+                href="https://calendly.com/team-procware/new-meeting"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-colors shadow-md text-center cursor-pointer"
+              >
+                <span>{currentLang === "en" ? "Book Free Strategy Call" : "Erstgespräch buchen"}</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
-          <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <a
-              href="https://calendly.com/team-procware/new-meeting"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-colors shadow-md text-center cursor-pointer"
-            >
-              <span>{currentLang === "en" ? "Book Free Strategy Call" : "Erstgespräch buchen"}</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
+        )}
       </section>
 
       {/* ========================================================= */}
       {/* RICH SEO KNOWLEDGE CONTENT: KEYWORDS BARCODE, GTIN, EAN */}
       {/* ========================================================= */}
-      <section className="border-t border-slate-200 bg-slate-50 py-16 sm:py-24">
+      {!hideSeoContent && (
+        <>
+        <section className="border-t border-slate-200 bg-slate-50 py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-16">
           {/* SEO Heading Intro */}
           <div className="space-y-4">
@@ -992,6 +1005,8 @@ export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({ onOp
           </div>
         </div>
       </section>
+      </>
+      )}
     </div>
   );
 };

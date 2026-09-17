@@ -48,32 +48,6 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenBooking }) => {
             ))}
           </Accordion>
         </div>
-
-        {/* Contact CTA below FAQ */}
-        <div className="mt-12 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#f14f44] flex items-center justify-center shrink-0">
-              <MessageCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="text-base font-black text-slate-950 tracking-tight">
-                Deine Frage ist nicht dabei?
-              </h4>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                Unser Team in Deutschland berät dich gerne persönlich zu deinem Sortiment.
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="brand"
-            size="default"
-            onClick={onOpenBooking}
-            className="shrink-0 font-black px-6 rounded-xl"
-          >
-            <span>Frage stellen / Termin</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
       </div>
     </section>
   );

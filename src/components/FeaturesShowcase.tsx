@@ -9,6 +9,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { FEATURES, PROCWARE_LOGO } from "../data/procwareData";
+import { ProductSampleCard } from "./ProductSampleCard";
 
 export const FeaturesShowcase: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -129,62 +130,66 @@ export const FeaturesShowcase: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Software Frame Column (Framed with Procware wide logo on top left) */}
-                <div className="lg:col-span-6">
-                  <div className="relative rounded-3xl overflow-hidden border border-slate-200/90 bg-white shadow-xl shadow-slate-200/50 p-2 sm:p-3 group">
-                    {/* Software Top App Bar with Procware Wide Logo */}
-                    <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl mb-3">
-                      <div className="flex items-center gap-3">
-                        {/* macOS Window Controls */}
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
+                {/* Software Frame Column or Standalone Product Card for Step 3 */}
+                <div className="lg:col-span-6 flex items-center justify-center">
+                  {idx === 2 ? (
+                    <ProductSampleCard className="w-full shadow-md border-slate-200" />
+                  ) : (
+                    <div className="w-full relative rounded-3xl overflow-hidden border border-slate-200/90 bg-white shadow-xl shadow-slate-200/50 p-2 sm:p-3 group">
+                      {/* Software Top App Bar with Procware Wide Logo */}
+                      <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl mb-3">
+                        <div className="flex items-center gap-3">
+                          {/* macOS Window Controls */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
+                          </div>
+                          {/* Authentic Wide Procware Logo in Software Top-Left */}
+                          <div className="h-5 flex items-center pl-2 border-l border-slate-200">
+                            <img
+                              src={PROCWARE_LOGO}
+                              alt="Procware"
+                              className="h-4.5 w-auto object-contain"
+                              loading="lazy"
+                            />
+                          </div>
                         </div>
-                        {/* Authentic Wide Procware Logo in Software Top-Left */}
-                        <div className="h-5 flex items-center pl-2 border-l border-slate-200">
-                          <img
-                            src={PROCWARE_LOGO}
-                            alt="Procware"
-                            className="h-4.5 w-auto object-contain"
-                            loading="lazy"
-                          />
+
+                        {/* Right status badge */}
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span>Shopify Sync aktiv</span>
+                          </span>
                         </div>
                       </div>
 
-                      {/* Right status badge */}
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          <span>Shopify Sync aktiv</span>
+                      {/* Clean Visual / Sourcing Display */}
+                      <div className="relative rounded-2xl overflow-hidden bg-slate-950/5 flex items-center justify-center">
+                        <img
+                          src={feature.imageUrl}
+                          alt={feature.imageAlt}
+                          className="w-full h-auto max-h-[420px] object-cover rounded-xl transition-all duration-300 group-hover:scale-[1.01]"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+
+                      {/* Bottom Info Bar */}
+                      <div className="mt-3 pt-2 flex items-center justify-between text-xs text-slate-500 font-medium px-2">
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+                          <span className="font-semibold text-slate-700">
+                            Offizielle Shopify Partner App &amp; Logistik
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-mono font-bold">
+                          {feature.stepNumber} / 03
                         </span>
                       </div>
                     </div>
-
-                    {/* Single Clean Screenshot Image */}
-                    <div className="relative rounded-2xl overflow-hidden bg-slate-950/5 flex items-center justify-center">
-                      <img
-                        src={feature.imageUrl}
-                        alt={feature.imageAlt}
-                        className="w-full h-auto max-h-[420px] object-cover sm:object-contain rounded-xl transition-all duration-300 group-hover:scale-[1.01]"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    {/* Bottom Info Bar */}
-                    <div className="mt-3 pt-2 flex items-center justify-between text-xs text-slate-500 font-medium px-2">
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-                        <span className="font-semibold text-slate-700">
-                          Offizielle Shopify Partner App & Logistik
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-mono font-bold">
-                        {feature.stepNumber} / 03
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );

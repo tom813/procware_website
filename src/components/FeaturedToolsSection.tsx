@@ -13,6 +13,7 @@ import {
   Sparkles,
   Scale,
   Cpu,
+  ShieldCheck,
 } from "lucide-react";
 
 export const FeaturedToolsSection: React.FC = () => {
@@ -88,6 +89,15 @@ export const FeaturedToolsSection: React.FC = () => {
       badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
       link: "/shopify-app-detector",
       icon: <Cpu className="w-5 h-5 text-indigo-500" />,
+    },
+    {
+      id: "safety-stock",
+      title: "Safety Stock & Meldebestand Rechner",
+      desc: "Optimalen Bestellzeitpunkt, Sicherheitsbestand und PO-Mengen berechnen. Vermeide Out-of-Stock.",
+      badge: "Logistik",
+      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+      link: "/safety-stock-calculator",
+      icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
     },
   ];
 

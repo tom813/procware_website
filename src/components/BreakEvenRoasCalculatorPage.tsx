@@ -23,11 +23,13 @@ import { Badge } from "./ui/badge";
 interface BreakEvenRoasCalculatorPageProps {
   onOpenBooking: () => void;
   lang?: "de" | "en";
+  hideSeoContent?: boolean;
 }
 
 export const BreakEvenRoasCalculatorPage: React.FC<BreakEvenRoasCalculatorPageProps> = ({
   onOpenBooking,
   lang: propLang,
+  hideSeoContent = false,
 }) => {
   const location = useLocation();
   const currentLang: "de" | "en" = propLang || (location.pathname.startsWith("/en") ? "en" : "de");
@@ -450,7 +452,8 @@ Berechnet mit https://procware.io/break-even-roas-calculator`;
       </section>
 
       {/* SEO & FAQ */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200">
+      {!hideSeoContent && (
+        <section className="py-12 bg-slate-50 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xs">
             <h2 className="text-2xl font-black text-slate-950 mb-4">
@@ -492,6 +495,7 @@ Berechnet mit https://procware.io/break-even-roas-calculator`;
           </div>
         </div>
       </section>
+      )}
     </div>
   );
 };

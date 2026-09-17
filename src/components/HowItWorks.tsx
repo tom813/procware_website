@@ -2,6 +2,8 @@ import React from "react";
 import { Badge } from "./ui/badge";
 import { ArrowRight, Link2, MessageSquare, Zap, ExternalLink, Calendar } from "lucide-react";
 import { HOW_IT_WORKS_STEPS } from "../data/procwareData";
+import { ProductSampleCard } from "./ProductSampleCard";
+import { ShopifyLogo } from "./ShopifyLogo";
 
 export const HowItWorks: React.FC = () => {
   const getStepIcon = (index: number) => {
@@ -109,8 +111,9 @@ export const HowItWorks: React.FC = () => {
                   href="https://apps.shopify.com/ltp-ludwig-trading-plattform"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold rounded-xl border border-slate-300 text-slate-800 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-xl border border-slate-300 text-slate-800 hover:bg-slate-50 transition-colors"
                 >
+                  <ShopifyLogo className="w-4 h-4 shrink-0" />
                   <span>Zur Procware Shopify App</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
@@ -118,15 +121,7 @@ export const HowItWorks: React.FC = () => {
             </div>
 
             <div className="lg:col-span-7">
-              <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 p-2 shadow-md">
-                <img
-                  src="https://procware.de/wp-content/uploads/2025/06/rundgang.png"
-                  alt="Procware Plattform Rundgang Dashboard"
-                  className="w-full h-auto object-cover rounded-xl"
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              <ProductSampleCard />
             </div>
           </div>
         </div>
