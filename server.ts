@@ -554,6 +554,29 @@ async function startServer() {
     return res.status(404).send("Image not found");
   });
 
+  // Static asset serving & S3 fallback for images & flags
+  const publicPath = path.join(process.cwd(), "public");
+  app.use(express.static(publicPath));
+
+  // Fallback for image and flag assets from S3 if missing on local disk
+  app.get(["/images/*", "/flags/*", "/procware-logo-wide.png"], async (req, res, next) => {
+    const key = req.path.replace(/^\/+/, "");
+    try {
+      const file = await getFileFromS3(key);
+      if (file) {
+        res.setHeader("Content-Type", file.contentType);
+        if (file.contentLength) {
+          res.setHeader("Content-Length", file.contentLength);
+        }
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.send(file.buffer);
+      }
+    } catch {
+      // Continue to next handler
+    }
+    return res.status(404).send("Image not found");
+  });
+
   // Vite middleware for development vs static production serve
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
