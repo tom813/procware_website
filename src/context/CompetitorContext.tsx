@@ -88,9 +88,10 @@ export const CompetitorProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setCompetitors(INITIAL_COMPETITORS);
     }
 
-    // Cloud SQL remote sync for authenticated users
+    // Cloud SQL remote sync for authenticated users (server derives the
+    // owner from the authenticated session, not from this query param)
     if (userKey && userKey !== "guest") {
-      fetch(`/api/sync/competitors?userId=${encodeURIComponent(userKey)}`)
+      fetch("/api/sync/competitors")
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.competitors) && data.competitors.length > 0) {
@@ -125,7 +126,7 @@ export const CompetitorProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           fetch("/api/sync/competitors", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: userKey, competitor: c }),
+            body: JSON.stringify({ competitor: c }),
           }).catch((err) => console.warn("Cloud SQL competitor sync error", err));
         });
       }
@@ -171,7 +172,7 @@ export const CompetitorProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       fetch("/api/sync/competitors", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: userKey, domain: compToDelete.domain }),
+        body: JSON.stringify({ domain: compToDelete.domain }),
       }).catch((err) => console.warn("Cloud SQL competitor delete error", err));
     }
   };

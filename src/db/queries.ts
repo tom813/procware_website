@@ -1,56 +1,14 @@
 import { db } from "./index.ts";
-import { users, leads, monitoredStores, productWatchlist, competitors } from "./schema.ts";
+import { leads, monitoredStores, productWatchlist, competitors } from "./schema.ts";
 import { eq, and } from "drizzle-orm";
 
 // In-memory fallback stores (used when DB is unreachable or not yet configured)
-const memUsers = new Map<string, any>();
 const memLeads: any[] = [];
 const memStores = new Map<string, any[]>();
 const memWatchlist = new Map<string, any[]>();
 const memCompetitors = new Map<string, any[]>();
 
 const isDbReady = () => Boolean(process.env.DATABASE_URL || process.env.SQL_HOST);
-
-export async function upsertUser(uid: string, email: string, name?: string, avatar?: string) {
-  if (isDbReady()) {
-    try {
-      const result = await db
-        .insert(users)
-        .values({
-          uid,
-          email,
-          name: name || null,
-          avatar: avatar || null,
-          lastLoginAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: users.uid,
-          set: {
-            email,
-            ...(name ? { name } : {}),
-            ...(avatar ? { avatar } : {}),
-            lastLoginAt: new Date(),
-          },
-        })
-        .returning();
-
-      return result[0];
-    } catch (error) {
-      console.warn("Database upsertUser failed, using in-memory fallback:", error);
-    }
-  }
-
-  const existing = memUsers.get(uid) || { uid, createdAt: new Date() };
-  const updated = {
-    ...existing,
-    email,
-    name: name || existing.name || null,
-    avatar: avatar || existing.avatar || null,
-    lastLoginAt: new Date(),
-  };
-  memUsers.set(uid, updated);
-  return updated;
-}
 
 export async function saveLead(data: {
   email: string;
