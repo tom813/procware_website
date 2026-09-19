@@ -1,0 +1,22 @@
+# Local development database only — NOT used for deployment.
+# Deployment runs on Coolify with its own separate dev/prod Postgres (see OPS-05/DB-07).
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml down        # stop
+#   docker compose -f docker-compose.dev.yml down -v     # stop and wipe the data volume
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: procware
+      POSTGRES_PASSWORD: procware
+      POSTGRES_DB: procware_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - procware_dev_pgdata:/var/lib/postgresql/data
+
+volumes:
+  procware_dev_pgdata:
