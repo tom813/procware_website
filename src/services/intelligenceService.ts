@@ -270,13 +270,14 @@ export function saveShopifyStores(
     console.warn("Error saving Shopify stores locally", e);
   }
 
-  // Cloud SQL background persistence
+  // Cloud SQL background persistence (server derives the owner from the
+  // authenticated session; unauthenticated calls are rejected server-side).
   if (rawKey && rawKey !== "guest") {
     items.forEach((item) => {
       fetch("/api/sync/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: decodeURIComponent(rawKey), store: item }),
+        body: JSON.stringify({ store: item }),
       }).catch((e) => console.warn("Cloud SQL saveStore sync failed", e));
     });
   }
@@ -295,7 +296,7 @@ export async function deleteShopifyStoreRemote(
     await fetch("/api/sync/stores", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: decodeURIComponent(rawKey), domain: domainOrId }),
+      body: JSON.stringify({ domain: domainOrId }),
     });
   } catch (e) {
     console.warn("Cloud SQL deleteStore sync failed", e);
@@ -312,7 +313,7 @@ export async function fetchRemoteShopifyStores(
   if (!rawKey || rawKey === "guest") return loadShopifyStores(userKey);
 
   try {
-    const res = await fetch(`/api/sync/stores?userId=${rawKey}`);
+    const res = await fetch("/api/sync/stores");
     if (!res.ok) return loadShopifyStores(userKey);
     const data = await res.json();
     if (data.success && Array.isArray(data.stores) && data.stores.length > 0) {
@@ -396,13 +397,14 @@ export function saveProductWatchlist(
     console.warn("Error saving product watchlist locally", e);
   }
 
-  // Cloud SQL background persistence
+  // Cloud SQL background persistence (server derives the owner from the
+  // authenticated session; unauthenticated calls are rejected server-side).
   if (rawKey && rawKey !== "guest") {
     items.forEach((item) => {
       fetch("/api/sync/watchlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: decodeURIComponent(rawKey), product: item }),
+        body: JSON.stringify({ product: item }),
       }).catch((e) => console.warn("Cloud SQL saveProduct sync failed", e));
     });
   }
@@ -421,7 +423,7 @@ export async function deleteProductWatchlistRemote(
     await fetch("/api/sync/watchlist", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: decodeURIComponent(rawKey), url: urlOrId }),
+      body: JSON.stringify({ url: urlOrId }),
     });
   } catch (e) {
     console.warn("Cloud SQL deleteProduct sync failed", e);
@@ -438,7 +440,7 @@ export async function fetchRemoteProductWatchlist(
   if (!rawKey || rawKey === "guest") return loadProductWatchlist(userKey);
 
   try {
-    const res = await fetch(`/api/sync/watchlist?userId=${rawKey}`);
+    const res = await fetch("/api/sync/watchlist");
     if (!res.ok) return loadProductWatchlist(userKey);
     const data = await res.json();
     if (data.success && Array.isArray(data.items) && data.items.length > 0) {

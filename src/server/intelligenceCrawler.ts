@@ -1,4 +1,5 @@
 import { ShopifyCrawlResult } from "../types/intelligence";
+import { safeFetch } from "./lib/ssrfGuard.ts";
 
 /**
  * Normalizes user input into a clean Shopify domain URL
@@ -35,19 +36,14 @@ export async function crawlShopifyStore(rawUrl: string): Promise<ShopifyCrawlRes
   let usedLiveFetch = false;
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6500);
-
-    const response = await fetch(endpoint, {
-      signal: controller.signal,
+    const response = await safeFetch(endpoint, {
+      timeoutMs: 6500,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         Accept: "application/json",
       },
     });
-
-    clearTimeout(timeout);
 
     if (response.ok) {
       responseData = await response.json();
@@ -222,18 +218,14 @@ export async function crawlProductPrice(rawUrl: string): Promise<{
   if (handle && domain) {
     try {
       const jsEndpoint = `https://${domain}/products/${handle}.js`;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000);
-
-      const res = await fetch(jsEndpoint, {
-        signal: controller.signal,
+      const res = await safeFetch(jsEndpoint, {
+        timeoutMs: 4000,
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
           Accept: "application/json",
         },
       });
-      clearTimeout(timeout);
 
       if (res.ok) {
         const data = await res.json();
@@ -256,18 +248,14 @@ export async function crawlProductPrice(rawUrl: string): Promise<{
 
   // 2. Fetch page HTML to look for schema.org / OpenGraph price tags
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-
-    const res = await fetch(cleaned, {
-      signal: controller.signal,
+    const res = await safeFetch(cleaned, {
+      timeoutMs: 4000,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
-    clearTimeout(timeout);
 
     if (res.ok) {
       const html = await res.text();

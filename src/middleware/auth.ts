@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { adminAuth } from "../lib/firebase-admin.ts";
-import { DecodedIdToken } from "firebase-admin/auth";
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from "../lib/auth.ts";
 
 export interface AuthRequest extends Request {
-  user?: DecodedIdToken;
+  user?: { id: string; email: string; name: string };
 }
 
 export const requireAuth = async (
@@ -11,36 +11,31 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized: Missing token" });
-  }
-
-  const token = authHeader.split("Bearer ")[1];
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    req.user = decodedToken;
+    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+    if (!session) {
+      return res.status(401).json({ error: { code: "UNAUTHENTICATED", message: "Bitte melde dich an." } });
+    }
+    req.user = { id: session.user.id, email: session.user.email, name: session.user.name };
     next();
   } catch (error) {
-    console.error("Error verifying Firebase ID token:", error);
-    return res.status(401).json({ error: "Unauthorized: Invalid token" });
+    console.error("Error verifying session:", error);
+    return res.status(401).json({ error: { code: "UNAUTHENTICATED", message: "Bitte melde dich an." } });
   }
 };
 
 export const optionalAuth = async (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.split("Bearer ")[1];
-    try {
-      const decodedToken = await adminAuth.verifyIdToken(token);
-      req.user = decodedToken;
-    } catch {
-      // Ignored for optional auth
+  try {
+    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+    if (session) {
+      req.user = { id: session.user.id, email: session.user.email, name: session.user.name };
     }
+  } catch {
+    // Ignored for optional auth
   }
   next();
 };

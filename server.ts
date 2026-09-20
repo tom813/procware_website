@@ -1,12 +1,16 @@
 import express from "express";
 import path from "path";
+import { randomUUID } from "crypto";
 import { createServer as createViteServer } from "vite";
+import rateLimit from "express-rate-limit";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./src/lib/auth.ts";
+import { requireAuth, AuthRequest } from "./src/middleware/auth.ts";
 import { detectShopifyTheme, parseHtmlForShopifyTheme, cleanDomain } from "./src/server/themeDetector.js";
 import { detectShopifyApps, parseHtmlForShopifyApps } from "./src/server/appDetector.js";
 import { crawlShopifyStore, crawlProductPrice } from "./src/server/intelligenceCrawler.js";
 
 import {
-  upsertUser,
   saveLead,
   getLeadsList,
   getStoresForUser,
@@ -21,14 +25,20 @@ import {
 } from "./src/db/queries.ts";
 import { pool } from "./src/db/index.ts";
 import {
+  createFileRecord,
+  listFilesForOwner,
+  getOwnedFile,
+  deleteOwnedFile,
+} from "./src/db/fileQueries.ts";
+import {
   checkS3Connection,
   uploadFileToS3,
   getFileFromS3,
   deleteFileFromS3,
-  listFilesFromS3,
 } from "./src/server/s3Storage.ts";
 
-// In-memory persistent lead store (fallback)
+// In-memory persistent lead store (fallback only for the public lead-capture
+// form when the database is unreachable; never used for authenticated reads)
 interface StoredLead {
   id: string;
   name: string;
@@ -38,20 +48,25 @@ interface StoredLead {
   createdAt: string;
 }
 
-const capturedLeads: StoredLead[] = [
-  {
-    id: "lead-initial-1",
-    name: "Max E-Commerce",
-    email: "demo@shopify-store.de",
-    shopUrl: "snocks.com",
-    source: "Ecom Suite Registration",
-    createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-  },
-];
+const capturedLeads: StoredLead[] = [];
+
+// Rate limit for endpoints that trigger outbound server-side fetches to
+// user-supplied URLs (AUTH-05 / FILE-04: abuse & cost protection for public tools).
+const crawlerRateLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: "Zu viele Anfragen. Bitte versuche es in einer Minute erneut." },
+});
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Mounted before the JSON body parser: better-auth reads and parses the
+  // raw request body itself.
+  app.all("/api/auth/*", toNodeHandler(auth));
 
   app.use(express.json({ limit: "15mb" }));
   app.use(express.urlencoded({ extended: true, limit: "15mb" }));
@@ -61,18 +76,8 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
-  // Auth configuration endpoint (public client-id for Google OAuth)
-  app.get("/api/auth/config", (_req, res) => {
-    res.json({
-      googleClientId:
-        process.env.VITE_GOOGLE_CLIENT_ID ||
-        process.env.GOOGLE_CLIENT_ID ||
-        "946561379004-bse6a225v7l549fudfnfjsvqefuuqgav.apps.googleusercontent.com",
-    });
-  });
-
-  // Shopify Theme Detector API
-  app.all("/api/detect-theme", async (req, res) => {
+  // Shopify Theme Detector API (public lead-gen tool; SSRF-guarded + rate-limited)
+  app.all("/api/detect-theme", crawlerRateLimit, async (req, res) => {
     try {
       const targetUrl = (req.method === "POST" ? req.body?.url : req.query?.url) as string | undefined;
       const rawHtml = req.body?.html as string | undefined;
@@ -103,8 +108,8 @@ async function startServer() {
     }
   });
 
-  // Shopify App Detector API
-  app.all("/api/detect-apps", async (req, res) => {
+  // Shopify App Detector API (public lead-gen tool; SSRF-guarded + rate-limited)
+  app.all("/api/detect-apps", crawlerRateLimit, async (req, res) => {
     try {
       const targetUrl = (req.method === "POST" ? req.body?.url : req.query?.url) as string | undefined;
       const rawHtml = req.body?.html as string | undefined;
@@ -136,7 +141,8 @@ async function startServer() {
   });
 
   // Shopify Intelligence Suite: Crawl store & compute snapshot metrics
-  app.post("/api/intelligence/crawl-store", async (req, res) => {
+  // (public lead-gen tool; SSRF-guarded + rate-limited)
+  app.post("/api/intelligence/crawl-store", crawlerRateLimit, async (req, res) => {
     try {
       const targetUrl = req.body?.url as string | undefined;
       if (!targetUrl || typeof targetUrl !== "string" || targetUrl.trim().length === 0) {
@@ -158,7 +164,8 @@ async function startServer() {
   });
 
   // Competitor Price Tracker: Auto-crawl price and product title
-  app.post("/api/intelligence/fetch-product-price", async (req, res) => {
+  // (public lead-gen tool; SSRF-guarded + rate-limited)
+  app.post("/api/intelligence/fetch-product-price", crawlerRateLimit, async (req, res) => {
     try {
       const url = req.body?.url as string | undefined;
       if (!url || typeof url !== "string" || url.trim().length === 0) {
@@ -179,7 +186,8 @@ async function startServer() {
     }
   });
 
-  // Lead Collection Endpoint: Stores leads in Cloud SQL with in-memory fallback
+  // Lead Collection Endpoint (public marketing/booking form): Stores leads in
+  // Cloud SQL with in-memory fallback.
   app.post("/api/leads", async (req, res) => {
     try {
       const { name, email, shopUrl, source } = req.body || {};
@@ -203,7 +211,7 @@ async function startServer() {
       } catch (dbErr) {
         console.warn("[Cloud SQL Fallback] Lead saving to DB failed, using memory:", dbErr);
         const newLead: StoredLead = {
-          id: `lead-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+          id: `lead-${randomUUID()}`,
           name: leadPayload.name,
           email: cleanEmail,
           shopUrl: shopUrl?.trim() || "",
@@ -219,7 +227,8 @@ async function startServer() {
     }
   });
 
-  app.get("/api/leads", async (_req, res) => {
+  // Leads list contains PII (name, email) -> requires authentication (API-01, FILE-05).
+  app.get("/api/leads", requireAuth, async (_req, res) => {
     try {
       const dbLeads = await getLeadsList();
       return res.json({ success: true, count: dbLeads.length, leads: dbLeads });
@@ -228,29 +237,13 @@ async function startServer() {
     }
   });
 
-  // User Profile Cloud SQL Sync
-  app.post("/api/sync/user", async (req, res) => {
+  // -------------------------------------------------------------
+  // Ecom Suite Sync Endpoints (Cloud SQL) — all scoped to the
+  // authenticated session's user id (TEN-01: never from query/body).
+  // -------------------------------------------------------------
+  app.get("/api/sync/stores", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const { uid, email, name, avatar } = req.body || {};
-      if (!uid || !email) {
-        return res.status(400).json({ success: false, error: "Missing uid or email." });
-      }
-      const user = await upsertUser(uid, email, name, avatar);
-      return res.json({ success: true, user });
-    } catch (error: any) {
-      console.error("[Sync User Error]:", error);
-      return res.status(500).json({ success: false, error: error.message || "Failed to sync user." });
-    }
-  });
-
-  // Monitored Stores Cloud SQL Endpoints
-  app.get("/api/sync/stores", async (req, res) => {
-    try {
-      const userId = (req.query.userId as string)?.trim().toLowerCase();
-      if (!userId) {
-        return res.status(400).json({ success: false, error: "Missing userId." });
-      }
-      const stores = await getStoresForUser(userId);
+      const stores = await getStoresForUser(req.user!.id);
       return res.json({ success: true, stores });
     } catch (error: any) {
       console.error("[Get Stores Error]:", error);
@@ -258,13 +251,13 @@ async function startServer() {
     }
   });
 
-  app.post("/api/sync/stores", async (req, res) => {
+  app.post("/api/sync/stores", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const { userId, store } = req.body || {};
-      if (!userId || !store || !store.domain) {
-        return res.status(400).json({ success: false, error: "Missing userId or store.domain." });
+      const { store } = req.body || {};
+      if (!store || !store.domain) {
+        return res.status(400).json({ success: false, error: "Missing store.domain." });
       }
-      const saved = await saveStoreForUser(userId.trim().toLowerCase(), store);
+      const saved = await saveStoreForUser(req.user!.id, store);
       return res.json({ success: true, store: saved });
     } catch (error: any) {
       console.error("[Save Store Error]:", error);
@@ -272,14 +265,13 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/sync/stores", async (req, res) => {
+  app.delete("/api/sync/stores", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = (req.query.userId as string || req.body?.userId)?.trim().toLowerCase();
-      const domainOrId = (req.query.domain as string || req.body?.domain || req.query.id as string || req.body?.id);
-      if (!userId || !domainOrId) {
-        return res.status(400).json({ success: false, error: "Missing userId or domain/id." });
+      const domainOrId = (req.query.domain as string) || req.body?.domain || (req.query.id as string) || req.body?.id;
+      if (!domainOrId) {
+        return res.status(400).json({ success: false, error: "Missing domain/id." });
       }
-      await deleteStoreForUser(userId, domainOrId);
+      await deleteStoreForUser(req.user!.id, domainOrId);
       return res.json({ success: true });
     } catch (error: any) {
       console.error("[Delete Store Error]:", error);
@@ -287,14 +279,9 @@ async function startServer() {
     }
   });
 
-  // Product Watchlist Cloud SQL Endpoints
-  app.get("/api/sync/watchlist", async (req, res) => {
+  app.get("/api/sync/watchlist", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = (req.query.userId as string)?.trim().toLowerCase();
-      if (!userId) {
-        return res.status(400).json({ success: false, error: "Missing userId." });
-      }
-      const items = await getProductWatchlistForUser(userId);
+      const items = await getProductWatchlistForUser(req.user!.id);
       return res.json({ success: true, items });
     } catch (error: any) {
       console.error("[Get Watchlist Error]:", error);
@@ -302,13 +289,13 @@ async function startServer() {
     }
   });
 
-  app.post("/api/sync/watchlist", async (req, res) => {
+  app.post("/api/sync/watchlist", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const { userId, product } = req.body || {};
-      if (!userId || !product || !product.url) {
-        return res.status(400).json({ success: false, error: "Missing userId or product.url." });
+      const { product } = req.body || {};
+      if (!product || !product.url) {
+        return res.status(400).json({ success: false, error: "Missing product.url." });
       }
-      const saved = await saveProductForUser(userId.trim().toLowerCase(), product);
+      const saved = await saveProductForUser(req.user!.id, product);
       return res.json({ success: true, product: saved });
     } catch (error: any) {
       console.error("[Save Watchlist Error]:", error);
@@ -316,14 +303,13 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/sync/watchlist", async (req, res) => {
+  app.delete("/api/sync/watchlist", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = (req.query.userId as string || req.body?.userId)?.trim().toLowerCase();
-      const productIdOrUrl = (req.query.url as string || req.body?.url || req.query.id as string || req.body?.id);
-      if (!userId || !productIdOrUrl) {
-        return res.status(400).json({ success: false, error: "Missing userId or url/id." });
+      const productIdOrUrl = (req.query.url as string) || req.body?.url || (req.query.id as string) || req.body?.id;
+      if (!productIdOrUrl) {
+        return res.status(400).json({ success: false, error: "Missing url/id." });
       }
-      await deleteProductForUser(userId, productIdOrUrl);
+      await deleteProductForUser(req.user!.id, productIdOrUrl);
       return res.json({ success: true });
     } catch (error: any) {
       console.error("[Delete Watchlist Error]:", error);
@@ -331,14 +317,9 @@ async function startServer() {
     }
   });
 
-  // Competitors Cloud SQL Endpoints
-  app.get("/api/sync/competitors", async (req, res) => {
+  app.get("/api/sync/competitors", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = (req.query.userId as string)?.trim().toLowerCase();
-      if (!userId) {
-        return res.status(400).json({ success: false, error: "Missing userId." });
-      }
-      const list = await getCompetitorsForUser(userId);
+      const list = await getCompetitorsForUser(req.user!.id);
       return res.json({ success: true, competitors: list });
     } catch (error: any) {
       console.error("[Get Competitors Error]:", error);
@@ -346,13 +327,13 @@ async function startServer() {
     }
   });
 
-  app.post("/api/sync/competitors", async (req, res) => {
+  app.post("/api/sync/competitors", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const { userId, competitor } = req.body || {};
-      if (!userId || !competitor || !competitor.domain) {
-        return res.status(400).json({ success: false, error: "Missing userId or competitor.domain." });
+      const { competitor } = req.body || {};
+      if (!competitor || !competitor.domain) {
+        return res.status(400).json({ success: false, error: "Missing competitor.domain." });
       }
-      const saved = await saveCompetitorForUser(userId.trim().toLowerCase(), competitor);
+      const saved = await saveCompetitorForUser(req.user!.id, competitor);
       return res.json({ success: true, competitor: saved });
     } catch (error: any) {
       console.error("[Save Competitor Error]:", error);
@@ -360,14 +341,13 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/sync/competitors", async (req, res) => {
+  app.delete("/api/sync/competitors", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = (req.query.userId as string || req.body?.userId)?.trim().toLowerCase();
-      const competitorId = (req.query.id as string || req.body?.id);
-      if (!userId || !competitorId) {
-        return res.status(400).json({ success: false, error: "Missing userId or id." });
+      const competitorId = (req.query.id as string) || req.body?.id;
+      if (!competitorId) {
+        return res.status(400).json({ success: false, error: "Missing id." });
       }
-      await deleteCompetitorForUser(userId, competitorId);
+      await deleteCompetitorForUser(req.user!.id, competitorId);
       return res.json({ success: true });
     } catch (error: any) {
       console.error("[Delete Competitor Error]:", error);
@@ -435,12 +415,13 @@ async function startServer() {
   });
 
   // -------------------------------------------------------------
-  // Garage S3 Storage Endpoints
+  // Garage S3 Storage Endpoints (FILE-01..03): every object has a DB
+  // record owned by the uploader; clients reference files by DB id, never
+  // by raw storage key/prefix.
   // -------------------------------------------------------------
-  // Upload a file to Garage S3
-  app.post("/api/files/upload", async (req, res) => {
+  app.post("/api/files/upload", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const { filename, contentBase64, contentType, prefix } = req.body || {};
+      const { filename, contentBase64, contentType } = req.body || {};
       if (!filename || !contentBase64) {
         return res.status(400).json({
           success: false,
@@ -449,25 +430,30 @@ async function startServer() {
       }
 
       const buffer = Buffer.from(contentBase64, "base64");
-      const safePrefix = (prefix || "uploads").replace(/^\/+|\/+$/g, "");
       const cleanFilename = String(filename).replace(/[^a-zA-Z0-9_.-]/g, "_");
-      const timestamp = Date.now();
-      const key = `${safePrefix}/${timestamp}-${cleanFilename}`;
+      const fileId = randomUUID();
+      const key = `org-users/${req.user!.id}/${fileId}-${cleanFilename}`;
+      const mime = contentType || "application/octet-stream";
 
-      const uploadResult = await uploadFileToS3({
+      await uploadFileToS3({ key, buffer, contentType: mime });
+
+      const record = await createFileRecord({
+        id: fileId,
+        ownerUserId: req.user!.id,
         key,
-        buffer,
-        contentType: contentType || "application/octet-stream",
+        filename: cleanFilename,
+        mime,
+        size: buffer.length,
       });
 
       return res.json({
         success: true,
         file: {
-          key: uploadResult.key,
-          url: uploadResult.url,
-          proxyUrl: `/api/files/${uploadResult.key}`,
-          size: uploadResult.size,
-          contentType: contentType || "application/octet-stream",
+          id: record.id,
+          filename: record.filename,
+          size: record.size,
+          contentType: record.mime,
+          url: `/api/files/${record.id}`,
         },
       });
     } catch (error: any) {
@@ -479,11 +465,18 @@ async function startServer() {
     }
   });
 
-  // List files in Garage S3
-  app.get("/api/files", async (req, res) => {
+  // List the current user's own files
+  app.get("/api/files", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const prefix = (req.query.prefix as string) || "";
-      const files = await listFilesFromS3(prefix);
+      const rows = await listFilesForOwner(req.user!.id);
+      const files = rows.map((r) => ({
+        id: r.id,
+        filename: r.filename,
+        size: r.size,
+        contentType: r.mime,
+        createdAt: r.createdAt,
+        url: `/api/files/${r.id}`,
+      }));
       return res.json({ success: true, count: files.length, files });
     } catch (error: any) {
       return res.status(500).json({
@@ -493,20 +486,22 @@ async function startServer() {
     }
   });
 
-  // Download / Stream a file from Garage S3
-  app.get("/api/files/*", async (req, res) => {
+  // Download / Stream one of the current user's own files by DB id
+  app.get("/api/files/:id", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const fileKey = (req.params as any)[0];
-      if (!fileKey) {
-        return res.status(400).json({ success: false, error: "File key required" });
+      const record = await getOwnedFile(req.params.id, req.user!.id);
+      if (!record) {
+        return res.status(404).json({ success: false, error: "File not found" });
       }
 
-      const file = await getFileFromS3(fileKey);
+      const file = await getFileFromS3(record.key);
       if (!file) {
         return res.status(404).json({ success: false, error: "File not found in S3 bucket" });
       }
 
       res.setHeader("Content-Type", file.contentType);
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Disposition", `attachment; filename="${record.filename.replace(/"/g, "")}"`);
       if (file.contentLength) {
         res.setHeader("Content-Length", file.contentLength);
       }
@@ -519,15 +514,16 @@ async function startServer() {
     }
   });
 
-  // Delete a file from Garage S3
-  app.delete("/api/files/*", async (req, res) => {
+  // Delete one of the current user's own files by DB id
+  app.delete("/api/files/:id", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const fileKey = (req.params as any)[0];
-      if (!fileKey) {
-        return res.status(400).json({ success: false, error: "File key required" });
+      const record = await getOwnedFile(req.params.id, req.user!.id);
+      if (!record) {
+        return res.status(404).json({ success: false, error: "File not found" });
       }
-      const success = await deleteFileFromS3(fileKey);
-      return res.json({ success });
+      await deleteFileFromS3(record.key);
+      await deleteOwnedFile(record.id, req.user!.id);
+      return res.json({ success: true });
     } catch (error: any) {
       return res.status(500).json({
         success: false,
@@ -559,7 +555,7 @@ async function startServer() {
   app.use(express.static(publicPath));
 
   // Fallback for image and flag assets from S3 if missing on local disk
-  app.get(["/images/*", "/flags/*", "/procware-logo-wide.png"], async (req, res, next) => {
+  app.get(["/images/*", "/flags/*", "/procware-logo-wide.png"], async (req, res) => {
     const key = req.path.replace(/^\/+/, "");
     try {
       const file = await getFileFromS3(key);

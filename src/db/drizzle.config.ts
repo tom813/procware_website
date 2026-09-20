@@ -24,7 +24,7 @@ if (!password) {
 console.log(`Using user: ${user} to connect to database.`);
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
+  schema: ["./src/db/schema.ts", "./src/db/authSchema.ts"],
   out: "./drizzle",
   dialect: "postgresql",
   schemaFilter: ["public"],
