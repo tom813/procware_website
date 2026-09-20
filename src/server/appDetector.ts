@@ -5,6 +5,7 @@ import {
   SHOPIFY_APPS_CATALOG,
 } from "../data/shopifyAppsData";
 import { cleanDomain, detectAlternativePlatform } from "./themeDetector";
+import { safeFetch } from "./lib/ssrfGuard.ts";
 
 export function parseHtmlForShopifyApps(
   html: string,
@@ -406,30 +407,19 @@ export async function detectShopifyApps(targetUrl: string): Promise<AppDetection
     hostname = "waterjake.de";
   }
 
-  const tryFetch = async (url: string): Promise<Response> => {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-          "Accept-Language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
-          "Cache-Control": "no-cache",
-        },
-        redirect: "follow",
-      });
-      clearTimeout(timeout);
-      return res;
-    } catch (e) {
-      clearTimeout(timeout);
-      throw e;
-    }
-  };
+  const tryFetch = (url: string) =>
+    safeFetch(url, {
+      timeoutMs: 12000,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Cache-Control": "no-cache",
+      },
+    });
 
-  let response: Response;
+  let response: Awaited<ReturnType<typeof safeFetch>>;
   try {
     response = await tryFetch(normalizedUrl);
   } catch (error: any) {
@@ -454,5 +444,5 @@ export async function detectShopifyApps(targetUrl: string): Promise<AppDetection
   const finalUrl = response.url || normalizedUrl;
   const html = await response.text();
 
-  return parseHtmlForShopifyApps(html, normalizedUrl, hostname, response.headers, finalUrl);
+  return parseHtmlForShopifyApps(html, normalizedUrl, hostname, response.headers as any, finalUrl);
 }

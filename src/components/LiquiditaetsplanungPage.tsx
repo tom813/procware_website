@@ -57,7 +57,6 @@ export const LiquiditaetsplanungPage: React.FC<LiquiditaetsplanungPageProps> = (
   const [monthlyGrowthRate, setMonthlyGrowthRate] = useState<number>(8); // % MoM growth
   const [cogsPercent, setCogsPercent] = useState<number>(32); // 32% of sales
   const [inventoryReorderInterval, setInventoryReorderInterval] = useState<1 | 2 | 3 | 4>(2); // Reorder every X months
-  const [upfrontDepositPercent, setUpfrontDepositPercent] = useState<number>(50); // % upfront deposit for goods (e.g. 30%, 50%, 100%)
   const [adSpendPercent, setAdSpendPercent] = useState<number>(30); // % of revenue for Meta/Google Ads
   const [monthlyFixedCosts, setMonthlyFixedCosts] = useState<number>(4500); // Salaries, Shopify apps, tools, warehouse
   const [taxReservePercent, setTaxReservePercent] = useState<number>(16); // MwSt & tax reserve %
@@ -81,7 +80,7 @@ export const LiquiditaetsplanungPage: React.FC<LiquiditaetsplanungPageProps> = (
     let minCashMonth = 0;
     let cashOutMonth: number | null = null;
 
-    // Procware Optimized Scenario (-20% COGS and 30% upfront deposit)
+    // Procware Optimized Scenario (-20% COGS via direct factory sourcing)
     const procwareCogsPercent = cogsPercent * 0.8;
     let runningCashProcware = startingCash;
 

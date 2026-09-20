@@ -7,6 +7,7 @@ import {
   KNOWN_EXTERNAL_THEMES,
   APP_SIGNATURES,
 } from "../data/shopifyThemesData";
+import { safeFetch } from "./lib/ssrfGuard.ts";
 
 export function cleanDomain(inputUrl: string): { normalizedUrl: string; hostname: string } {
   let url = inputUrl.trim();
@@ -350,13 +351,10 @@ export function parseHtmlForShopifyTheme(
 export async function detectShopifyTheme(targetUrl: string): Promise<ThemeDetectionResult> {
   const { normalizedUrl, hostname } = cleanDomain(targetUrl);
 
-  let response: Response;
+  let response: Awaited<ReturnType<typeof safeFetch>>;
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
-    response = await fetch(normalizedUrl, {
-      signal: controller.signal,
+    response = await safeFetch(normalizedUrl, {
+      timeoutMs: 12000,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -364,9 +362,7 @@ export async function detectShopifyTheme(targetUrl: string): Promise<ThemeDetect
         "Accept-Language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
         "Cache-Control": "no-cache",
       },
-      redirect: "follow",
     });
-    clearTimeout(timeout);
   } catch (error: any) {
     throw new Error(
       `Verbindung zur URL konnte nicht hergestellt werden (${error.message || "Timeout/Netzwerkfehler"}). Bitte prüfe, ob die Domain erreichbar ist.`
@@ -376,5 +372,5 @@ export async function detectShopifyTheme(targetUrl: string): Promise<ThemeDetect
   const finalUrl = response.url || normalizedUrl;
   const html = await response.text();
 
-  return parseHtmlForShopifyTheme(html, normalizedUrl, hostname, response.headers, finalUrl);
+  return parseHtmlForShopifyTheme(html, normalizedUrl, hostname, response.headers as any, finalUrl);
 }

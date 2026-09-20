@@ -314,6 +314,7 @@ export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({
     const valueToRender = validation.sanitized;
 
     if (!valueToRender || (!validation.isValid && validation.message)) {
+      svgRef.current.innerHTML = "";
       setErrorMsg(validation.message || "Ungültige Eingabe für dieses Format.");
       return;
     }
@@ -641,12 +642,15 @@ export const BarcodeGeneratorPage: React.FC<BarcodeGeneratorPageProps> = ({
         <div className="bg-slate-50/80 border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs flex flex-col items-center">
           {/* White Card holding the rendered SVG */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm max-w-lg w-full flex flex-col items-center justify-center min-h-[160px]">
-            {errorMsg ? (
+            {/* The <svg> stays mounted at all times so svgRef never goes stale;
+                it is only hidden visually while there's an error. Unmounting it
+                conditionally used to null out the ref and permanently break the
+                render effect's early-return guard once an error occurred. */}
+            <svg ref={svgRef} className={errorMsg ? "hidden" : "max-w-full h-auto"} />
+            {errorMsg && (
               <div className="text-center py-6 text-slate-400 text-xs font-medium">
                 Bitte gültige Zeichen für das ausgewählte Format eingeben.
               </div>
-            ) : (
-              <svg ref={svgRef} className="max-w-full h-auto" />
             )}
           </div>
 
