@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { PROCWARE_LOGO } from "../data/procwareData";
+import { IMPRESSUM, DATENSCHUTZ } from "../data/legalData";
 import {
   Dialog,
   DialogContent,
@@ -48,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({
                 Unternehmen
               </div>
               <p className="text-xs text-slate-300 font-medium">
-                Ein Produkt der <strong>Ludwig Trading GmbH</strong> und <strong>Scalarsoft GmbH</strong>.
+                Ein Produkt der <strong>Scalarsoft GmbH</strong>.
               </p>
             </div>
 
@@ -363,60 +364,117 @@ export const Footer: React.FC<FooterProps> = ({
         open={!!legalModalType}
         onOpenChange={(open) => !open && setLegalModalType(null)}
       >
-        <DialogContent className="max-w-lg text-slate-900 rounded-3xl border-slate-200">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto text-slate-900 rounded-3xl border-slate-200">
           {legalModalType === "impressum" ? (
-            <div className="space-y-4 text-xs leading-relaxed">
+            <div className="space-y-5 text-xs leading-relaxed">
               <DialogTitle className="text-xl font-black text-slate-950 tracking-tight">
                 Impressum
               </DialogTitle>
-              <div className="space-y-2 text-slate-600 font-normal">
-                <p>
-                  <strong>Procware</strong> ist ein gemeinsames Produkt der:
-                </p>
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-                  <p className="font-bold text-slate-900">Ludwig Trading GmbH</p>
-                  <p>In Kooperation mit:</p>
-                  <p className="font-bold text-slate-900">Scalarsoft GmbH</p>
+              <DialogDescription className="sr-only">
+                Gesetzliche Anbieterkennzeichnung der Scalarsoft GmbH
+              </DialogDescription>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 text-slate-700">
+                <div>
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Angaben gemäß § 5 Telemediengesetz (TMG)
+                  </h3>
+                  <p className="text-sm font-bold text-slate-950">{IMPRESSUM.company}</p>
+                  <p>{IMPRESSUM.address.street}</p>
+                  <p>{IMPRESSUM.address.city}</p>
+                  <p>{IMPRESSUM.address.country}</p>
                 </div>
-                <p>
-                  <strong>Kontakt:</strong>
-                  <br />
-                  E-Mail: team@procware.io
-                  <br />
-                  Web: https://procware.de
-                </p>
-                <p>
-                  <strong>Haftungshinweis:</strong>
-                  <br />
-                  Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte
-                  externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren
-                  Betreiber verantwortlich.
-                </p>
+                <div className="pt-3 border-t border-slate-200">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Vertretungsberechtigte Organe
+                  </h3>
+                  <p className="font-semibold text-slate-900">
+                    Geschäftsführer: {IMPRESSUM.management.ceo}
+                  </p>
+                  <p>Beirat: {IMPRESSUM.management.advisoryBoard}</p>
+                </div>
+                <div className="pt-3 border-t border-slate-200">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Kontakt & Internetpräsenz
+                  </h3>
+                  <p>
+                    Website:{" "}
+                    <a
+                      href={IMPRESSUM.contact.websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 font-semibold underline hover:text-blue-800"
+                    >
+                      {IMPRESSUM.contact.website}
+                    </a>
+                  </p>
+                  <p>{IMPRESSUM.contact.note}</p>
+                </div>
+              </div>
+              <div className="space-y-4 text-slate-600 font-normal">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-950 mb-1">EU-Streitschlichtung</h3>
+                  <p>{IMPRESSUM.euDisputeResolution.text}</p>
+                  <a
+                    href={IMPRESSUM.euDisputeResolution.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-1 text-blue-600 font-semibold underline hover:text-blue-800"
+                  >
+                    {IMPRESSUM.euDisputeResolution.url}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-950 mb-1">
+                    Verbraucherstreitbeilegung / Universalschlichtungsstelle
+                  </h3>
+                  <p>{IMPRESSUM.consumerDispute}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-950 mb-1">Haftung für Inhalte</h3>
+                  <p>{IMPRESSUM.liabilityContent}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-950 mb-1">Haftung für Links</h3>
+                  <p>{IMPRESSUM.liabilityLinks}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-950 mb-1">Urheberrecht</h3>
+                  <p>{IMPRESSUM.copyright}</p>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-4 text-xs leading-relaxed">
+            <div className="space-y-5 text-xs leading-relaxed">
               <DialogTitle className="text-xl font-black text-slate-950 tracking-tight">
                 Datenschutzerklärung
               </DialogTitle>
-              <div className="space-y-2 text-slate-600 font-normal">
-                <p>
-                  Der Schutz deiner persönlichen Daten ist uns ein besonderes Anliegen. Wir verarbeiten
-                  deine Daten ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, TMG).
-                </p>
-                <p>
-                  <strong>1. Erhebung und Verarbeitung personenbezogener Daten:</strong>
-                  <br />
-                  Wenn du per Formular oder E-Mail Kontakt mit uns aufnimmst, werden deine angegebenen
-                  Daten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns
-                  gespeichert.
-                </p>
-                <p>
-                  <strong>2. Deine Rechte:</strong>
-                  <br />
-                  Dir stehen bezüglich deiner bei uns gespeicherten Daten grundsätzlich die Rechte auf
-                  Auskunft, Berichtigung, Löschung, Einschränkung und Datenübertragbarkeit zu.
-                </p>
+              <DialogDescription className="sr-only">
+                Datenschutzerklärung gemäß DSGVO der Scalarsoft GmbH
+              </DialogDescription>
+              <div className="space-y-6 text-slate-600 font-normal">
+                {DATENSCHUTZ.map((section) => (
+                  <section key={section.id} className="space-y-3">
+                    <h3 className="text-base font-bold text-slate-950">
+                      {section.number}. {section.title}
+                    </h3>
+                    {section.blocks.map((block, i) => (
+                      <div key={i} className="space-y-2">
+                        {block.heading &&
+                          (block.level === 4 ? (
+                            <h5 className="font-semibold text-slate-800">{block.heading}</h5>
+                          ) : (
+                            <h4 className="text-sm font-bold text-slate-900">{block.heading}</h4>
+                          ))}
+                        {block.paragraphs.map((p, j) => (
+                          <p key={j} className="whitespace-pre-line">
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                  </section>
+                ))}
               </div>
             </div>
           )}
